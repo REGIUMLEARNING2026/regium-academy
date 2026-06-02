@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regium Academy – Professional Training Courses</title>
+<style>
+  :root {
+    --primary: #4f0080;
+    --primary-dark: #360058;
+    --accent: #a855f7;
+    --accent-light: #d8b4fe;
+    --gold: #f59e0b;
+    --white: #ffffff;
+    --gray-50: #fafafa;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --border-radius: 14px;
+    --shadow: 0 4px 24px rgba(79,0,128,0.12);
+    --shadow-lg: 0 8px 48px rgba(79,0,128,0.22);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gray-50); color: var(--gray-800); line-height: 1.6; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--primary-dark);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 64px;
+  }
+  .logo { color: white; font-size: 1.4rem; font-weight: 900; text-decoration: none; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent-light); }
+  .nav-links { display: flex; gap: 6px; align-items: center; }
+  .nav-links a { color: var(--gray-200); text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+  .nav-links a:hover { background: rgba(168,85,247,0.2); color: white; }
+  .nav-cta { background: var(--accent) !important; color: white !important; font-weight: 700 !important; }
+  .nav-cta:hover { background: var(--primary) !important; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 55%, #6d28d9 100%);
+    padding: 90px 24px 110px; text-align: center; color: white; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 70% 50%, rgba(168,85,247,0.15) 0%, transparent 70%);
+  }
+  .hero-inner { max-width: 860px; margin: 0 auto; position: relative; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(168,85,247,0.25); border: 1px solid rgba(168,85,247,0.45);
+    color: var(--accent-light); padding: 6px 18px; border-radius: 99px;
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 28px;
+  }
+  .hero h1 { font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 900; line-height: 1.08; margin-bottom: 20px; }
+  .hero h1 span { color: var(--accent-light); }
+  .hero p { font-size: 1.15rem; color: rgba(255,255,255,0.82); max-width: 620px; margin: 0 auto 44px; }
+  .hero-stats { display: flex; gap: 48px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 2rem; font-weight: 900; color: var(--accent-light); }
+  .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* DEPARTMENTS */
+  .dept-tabs {
+    background: white; border-bottom: 2px solid var(--gray-100);
+    position: sticky; top: 64px; z-index: 90;
+  }
+  .dept-tabs-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 24px;
+    display: flex; gap: 4px; overflow-x: auto;
+  }
+  .dept-tab {
+    padding: 16px 24px; font-size: 0.9rem; font-weight: 700;
+    color: var(--gray-600); border-bottom: 3px solid transparent;
+    cursor: pointer; white-space: nowrap; transition: all 0.2s; text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dept-tab:hover { color: var(--primary); }
+  .dept-tab.active { color: var(--primary); border-bottom-color: var(--accent); }
+
+  /* SECTIONS */
+  section { padding: 80px 24px; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-label { display: inline-block; color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; color: var(--gray-900); margin-bottom: 12px; }
+  .section-sub { color: var(--gray-600); font-size: 1.05rem; margin-bottom: 48px; max-width: 640px; }
+  .divider { width: 56px; height: 4px; background: var(--accent); border-radius: 2px; margin: 14px 0 28px; }
+
+  /* COURSES GRID */
+  #all-courses { background: white; }
+  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px; }
+  .course-card {
+    border-radius: 20px; overflow: hidden;
+    border: 1px solid var(--gray-200); background: white;
+    box-shadow: var(--shadow); transition: all 0.25s;
+    display: flex; flex-direction: column;
+  }
+  .course-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .course-card-banner {
+    padding: 28px 28px 20px; color: white; position: relative; overflow: hidden;
+  }
+  .course-card-banner::after {
+    content: ''; position: absolute; bottom: -20px; right: -20px;
+    width: 100px; height: 100px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .course-dept-tag {
+    display: inline-block; background: rgba(255,255,255,0.2);
+    color: white; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; padding: 4px 12px; border-radius: 99px; margin-bottom: 14px;
+  }
+  .course-card-banner h3 { font-size: 1.35rem; font-weight: 900; margin-bottom: 6px; }
+  .course-card-banner p { font-size: 0.875rem; opacity: 0.85; }
+  .course-card-body { padding: 24px 28px; flex: 1; display: flex; flex-direction: column; }
+  .course-price { font-size: 2rem; font-weight: 900; color: var(--primary); margin-bottom: 4px; }
+  .course-price span { font-size: 1rem; color: var(--gray-400); font-weight: 400; }
+  .course-includes { margin: 16px 0; display: flex; flex-direction: column; gap: 8px; }
+  .course-include { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; color: var(--gray-600); }
+  .course-include::before { content: '✓'; color: #10b981; font-weight: 800; flex-shrink: 0; }
+  .course-card-footer { padding: 0 28px 28px; }
+  .btn-enroll {
+    display: block; width: 100%; text-align: center; text-decoration: none;
+    background: var(--primary); color: white; font-weight: 700; font-size: 1rem;
+    padding: 14px; border-radius: 10px; transition: all 0.2s; border: none; cursor: pointer;
+  }
+  .btn-enroll:hover { background: var(--primary-dark); transform: scale(1.02); }
+  .btn-view {
+    display: block; width: 100%; text-align: center; text-decoration: none;
+    background: transparent; color: var(--accent); font-weight: 600; font-size: 0.875rem;
+    padding: 10px; margin-top: 8px; border-radius: 10px; transition: all 0.2s;
+    border: 2px solid var(--accent);
+  }
+  .btn-view:hover { background: var(--accent); color: white; }
+
+  /* COMING SOON BADGE */
+  .coming-soon {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #fef3c7; color: #92400e; font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase; padding: 4px 12px;
+    border-radius: 99px; margin-bottom: 16px;
+  }
+
+  /* WHY SECTION */
+  #why { background: linear-gradient(180deg, var(--gray-50) 0%, white 100%); }
+  .why-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .why-card {
+    background: white; border: 1px solid var(--gray-200); border-radius: var(--border-radius);
+    padding: 28px; text-align: center; transition: all 0.2s;
+  }
+  .why-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+  .why-icon { font-size: 2.5rem; margin-bottom: 14px; }
+  .why-card h3 { font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .why-card p { font-size: 0.875rem; color: var(--gray-600); }
+
+  /* TESTIMONIALS */
+  #testimonials { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); color: white; }
+  #testimonials h2 { color: white; }
+  #testimonials .section-sub { color: rgba(255,255,255,0.75); }
+  #testimonials .divider { background: var(--accent-light); }
+  .testi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .testi-card {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--border-radius); padding: 28px; transition: all 0.2s;
+  }
+  .testi-card:hover { background: rgba(255,255,255,0.12); }
+  .testi-stars { color: var(--gold); font-size: 1rem; margin-bottom: 12px; }
+  .testi-text { font-size: 0.9rem; color: rgba(255,255,255,0.88); line-height: 1.7; margin-bottom: 16px; }
+  .testi-author { font-size: 0.82rem; font-weight: 700; color: var(--accent-light); }
+  .testi-location { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
+
+  /* FOOTER */
+  footer { background: var(--gray-900); color: var(--gray-400); text-align: center; padding: 48px 24px; }
+  .footer-logo { font-size: 1.5rem; font-weight: 900; color: white; margin-bottom: 6px; }
+  .footer-logo span { color: var(--accent-light); }
+  .footer-tagline { font-size: 0.875rem; margin-bottom: 20px; }
+  .footer-depts { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 20px; }
+  .footer-depts a { color: var(--gray-400); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-depts a:hover { color: var(--accent-light); }
+  .footer-divider { width: 60px; height: 1px; background: rgba(255,255,255,0.1); margin: 20px auto; }
+  .footer-legal { font-size: 0.75rem; color: var(--gray-600); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 2rem; }
+    .hero-stats { gap: 24px; }
+    section { padding: 56px 16px; }
+    .courses-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><span>Regium</span> Academy</a>
+    <div class="nav-links">
+      <a href="#all-courses">Courses</a>
+      <a href="inkprint-academy.html">InkPrint Dept.</a>
+      <a href="permit-runner-academy.html">Permit Runner Dept.</a>
+      <a href="#why">Why Regium</a>
+      <a href="#all-courses" class="nav-cta">Browse Courses</a>
+    </div>
+  </div>
+</nav>
+
+<!-- DEPARTMENT TABS -->
+<div class="dept-tabs">
+  <div class="dept-tabs-inner">
+    <a href="index.html" class="dept-tab active">🏛️ All Departments</a>
+    <a href="inkprint-academy.html" class="dept-tab">🖐️ InkPrint Academy</a>
+    <a href="permit-runner-academy.html" class="dept-tab">📋 Permit Runner Academy</a>
+    <a href="process-server-academy.html" class="dept-tab">⚖️ Process Server Academy</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">🎓 Professional Training Platform</div>
+    <h1>Welcome to<br><span>Regium Academy</span></h1>
+    <p>Expert-led, self-paced professional courses designed to launch and grow your service-based business — in any state.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Departments</div></div>
+      <div class="stat"><div class="stat-num">50</div><div class="stat-label">States Covered</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Lifetime Access</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Self-Paced</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ALL COURSES -->
+<section id="all-courses">
+  <div class="section-inner">
+    <div class="section-label">Our Departments</div>
+    <h2>All Courses & Pricing</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Choose a department below to start your journey. Each course is one-time payment with lifetime access — learn at your own pace, no deadlines.</p>
+
+    <div class="courses-grid">
+
+      <!-- InkPrint Academy -->
+      <div class="course-card">
+        <div class="course-card-banner" style="background: linear-gradient(135deg, #4f0080 0%, #6d28d9 100%);">
+          <div class="course-dept-tag">🖐️ Department 1</div>
+          <h3>InkPrint Academy</h3>
+          <p>Master professional fingerprinting across all 50 states and build your own business.</p>
+        </div>
+        <div class="course-card-body">
+          <div class="course-price">$19.99 <span>one-time</span></div>
+          <div class="course-includes">
+            <div class="course-include">Ink fingerprinting techniques (all 50 states)</div>
+            <div class="course-include">Live Scan setup guide by state</div>
+            <div class="course-include">State licensing & channeler breakdown</div>
+            <div class="course-include">Business startup toolkit</div>
+            <div class="course-include">Marketing & canvassing strategies</div>
+            <div class="course-include">Community chat room access</div>
+            <div class="course-include">Certificate of Completion</div>
+          </div>
+        </div>
+        <div class="course-card-footer">
+          <a href="inkprint-academy.html#course" class="btn-enroll">🚀 Enroll Now – $19.99</a>
+          <a href="inkprint-academy.html" class="btn-view">View Full Course →</a>
+        </div>
+      </div>
+
+      <!-- Permit Runner Academy -->
+      <div class="course-card">
+        <div class="course-card-banner" style="background: linear-gradient(135deg, #065f46 0%, #059669 100%);">
+          <div class="course-dept-tag">📋 Department 2</div>
+          <h3>Permit Runner Academy</h3>
+          <p>Launch a profitable permit expediting business in any state with step-by-step training.</p>
+        </div>
+        <div class="course-card-body">
+          <div class="course-price">$14.99 <span>one-time</span></div>
+          <div class="course-includes">
+            <div class="course-include">Permit running requirements — all 50 states</div>
+            <div class="course-include">How to get started in your state</div>
+            <div class="course-include">Sample business plan template</div>
+            <div class="course-include">Do's & don'ts for permit runners</div>
+            <div class="course-include">Marketing & client acquisition strategies</div>
+            <div class="course-include">Community chat room access</div>
+            <div class="course-include">Certificate of Completion</div>
+          </div>
+        </div>
+        <div class="course-card-footer">
+          <a href="permit-runner-academy.html#course" class="btn-enroll" style="background:#059669">🚀 Enroll Now – $14.99</a>
+          <a href="permit-runner-academy.html" class="btn-view" style="color:#059669;border-color:#059669">View Full Course →</a>
+        </div>
+      </div>
+
+      <!-- Process Server Academy -->
+      <div class="course-card">
+        <div class="course-card-banner" style="background: linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 100%);">
+          <div class="course-dept-tag">⚖️ Department 3</div>
+          <h3>Process Server Academy</h3>
+          <p>Master process serving law in all 50 states and launch your own legal support business.</p>
+        </div>
+        <div class="course-card-body">
+          <div class="course-price">$14.99 <span>one-time</span></div>
+          <div class="course-includes">
+            <div class="course-include">All 50 states — clickable hyperlinks to each state</div>
+            <div class="course-include">Service methods, restrictions & affidavit requirements</div>
+            <div class="course-include">Registration process for states that require it</div>
+            <div class="course-include">Skip tracing fundamentals</div>
+            <div class="course-include">Business startup toolkit & pricing guide</div>
+            <div class="course-include">Community chat room access</div>
+            <div class="course-include">Certificate of Completion</div>
+          </div>
+        </div>
+        <div class="course-card-footer">
+          <a href="process-server-academy.html#course" class="btn-enroll" style="background:#1e3a5f">🚀 Enroll Now – $14.99</a>
+          <a href="process-server-academy.html" class="btn-view" style="color:#3b82f6;border-color:#3b82f6">View Full Course →</a>
+        </div>
+      </div>
+
+      <!-- Coming Soon placeholder -->
+      <div class="course-card" style="opacity:0.65;pointer-events:none">
+        <div class="course-card-banner" style="background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);">
+          <div class="course-dept-tag">🔜 Coming Soon</div>
+          <h3>More Departments</h3>
+          <p>New professional training courses are in development. Stay tuned.</p>
+        </div>
+        <div class="course-card-body">
+          <div class="coming-soon">🔔 Notify Me When Available</div>
+          <p style="font-size:0.875rem;color:var(--gray-600)">Regium Academy is expanding. New departments will be added as we grow. Submit an inquiry to suggest your next course topic.</p>
+        </div>
+        <div class="course-card-footer">
+          <button class="btn-enroll" style="background:var(--gray-400);cursor:default">Coming Soon</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- WHY REGIUM -->
+<section id="why">
+  <div class="section-inner">
+    <div class="section-label">The Regium Difference</div>
+    <h2>Why Choose Regium Academy?</h2>
+    <div class="divider"></div>
+    <p class="section-sub">We build practical, affordable courses for real business owners — not theory-heavy programs with big price tags.</p>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">🎯</div>
+        <h3>Practical & Actionable</h3>
+        <p>Every module is built around real-world application. You'll finish each course ready to work — not just ready to study more.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">⏱️</div>
+        <h3>Truly Self-Paced</h3>
+        <p>No deadlines, no live sessions required. Learn in the morning, evening, or weekend — your schedule, your pace.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🗺️</div>
+        <h3>All 50 States</h3>
+        <p>Every course covers the full United States — state-by-state requirements, regulations, and licensing specifics.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">💰</div>
+        <h3>Affordable Pricing</h3>
+        <p>Professional-grade training at a fraction of the cost. One-time payment. No subscriptions. No hidden fees. Lifetime access.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🤝</div>
+        <h3>Built-In Community</h3>
+        <p>Every course includes access to a live community chat room where graduates share tips, leads, and marketing strategies.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🏆</div>
+        <h3>Certificate of Completion</h3>
+        <p>Earn a printable Regium Academy certificate upon completing each course to add to your professional portfolio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-inner">
+    <div class="section-label">Student Voices</div>
+    <h2>What Our Students Say</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Real feedback from Regium Academy graduates building real businesses.</p>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"I had no idea how to get started with fingerprinting. InkPrint Academy laid out everything step by step. I landed my first school district contract within 6 weeks of finishing."</p>
+        <div class="testi-author">Marcus T.</div>
+        <div class="testi-location">Georgia • InkPrint Academy Graduate</div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The permit runner course saved me months of trial and error. The state-by-state breakdown alone was worth 10x the price. I'm now running permits full-time in three counties."</p>
+        <div class="testi-author">Latisha M.</div>
+        <div class="testi-location">Florida • Permit Runner Academy Graduate</div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"$19.99 for a full business course that actually tells you what to do in YOUR state? I've paid thousands for worse. Regium Academy is the real deal."</p>
+        <div class="testi-author">DeShawn W.</div>
+        <div class="testi-location">Texas • InkPrint Academy Graduate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><span>Regium</span> Academy</div>
+  <p class="footer-tagline">Professional Training for Service-Based Entrepreneurs</p>
+  <div class="footer-depts">
+    <a href="index.html">Home</a>
+    <a href="inkprint-academy.html">InkPrint Academy</a>
+    <a href="permit-runner-academy.html">Permit Runner Academy</a>
+    <a href="#all-courses">All Courses</a>
+    <a href="#why">Why Regium</a>
+  </div>
+  <div class="footer-divider"></div>
+  <p class="footer-legal">Regium Academy is a division of Regium, LLC (South Carolina). Course content is for educational purposes only. State licensing requirements are subject to change — always verify current requirements with your state's official licensing agency. Regium Academy is not affiliated with any government agency. © 2025 Regium, LLC. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
