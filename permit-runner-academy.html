@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Permit Runner Academy by Regium – All 50 States Permit Expediting Course</title>
+<!-- STRIPE -->
+<script src="https://js.stripe.com/v3/"></script>
+<!-- PAYPAL (add your Client ID when ready) -->
+<!-- <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD&intent=capture&enable-funding=venmo" data-namespace="paypal_sdk"></script> -->
+<style>
+  :root {
+    --primary: #065f46;
+    --primary-dark: #064e3b;
+    --accent: #10b981;
+    --accent-light: #6ee7b7;
+    --gold: #f59e0b;
+    --purple: #4f0080;
+    --white: #ffffff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --border-radius: 12px;
+    --shadow: 0 4px 24px rgba(6,95,70,0.12);
+    --shadow-lg: 0 8px 48px rgba(6,95,70,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gray-50); color: var(--gray-800); line-height: 1.6; }
+
+  nav {
+    position: sticky; top: 0; z-index: 1000;
+    background: var(--primary-dark); box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 64px;
+  }
+  .logo { color: white; font-size: 1.3rem; font-weight: 900; text-decoration: none; }
+  .logo span { color: var(--accent-light); }
+  .nav-links { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+  .nav-links a { color: #d1fae5; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+  .nav-links a:hover { background: rgba(16,185,129,0.2); color: white; }
+  .nav-cta { background: var(--accent) !important; color: var(--primary-dark) !important; font-weight: 800 !important; }
+  .nav-cta:hover { background: #059669 !important; color: white !important; }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 24px; height: 2px; background: white; border-radius: 2px; }
+
+  /* DEPT TABS */
+  .dept-tabs { background: white; border-bottom: 2px solid var(--gray-100); position: sticky; top: 64px; z-index: 90; }
+  .dept-tabs-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; overflow-x: auto; }
+  .dept-tab { padding: 14px 20px; font-size: 0.875rem; font-weight: 700; color: var(--gray-600); border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; transition: all 0.2s; text-decoration: none; }
+  .dept-tab:hover { color: var(--primary); }
+  .dept-tab.active { color: var(--primary); border-bottom-color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, #059669 100%);
+    padding: 80px 24px 100px; text-align: center; color: white; position: relative; overflow: hidden;
+  }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 60%, rgba(16,185,129,0.12) 0%, transparent 70%); }
+  .hero-inner { max-width: 800px; margin: 0 auto; position: relative; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(16,185,129,0.25); border: 1px solid rgba(16,185,129,0.45);
+    color: var(--accent-light); padding: 6px 18px; border-radius: 99px;
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px;
+  }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 20px; }
+  .hero h1 span { color: var(--accent-light); }
+  .hero p { font-size: 1.15rem; color: rgba(255,255,255,0.85); max-width: 600px; margin: 0 auto 36px; }
+  .hero-cta-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+  .btn-primary { background: var(--gold); color: var(--gray-900); border: none; padding: 14px 32px; border-radius: 10px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-primary:hover { background: #fbbf24; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,158,11,0.4); }
+  .btn-outline { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.4); padding: 14px 32px; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+  .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+  .hero-stats { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 2rem; font-weight: 900; color: var(--accent-light); }
+  .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* SECTIONS */
+  section { padding: 80px 24px; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-label { display: inline-block; color: var(--accent); font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; color: var(--gray-900); margin-bottom: 12px; }
+  .section-sub { color: var(--gray-600); font-size: 1.05rem; max-width: 600px; margin-bottom: 48px; }
+  .divider { width: 56px; height: 4px; background: var(--accent); border-radius: 2px; margin: 14px 0 28px; }
+
+  /* CARDS */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .card { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--border-radius); padding: 24px; transition: all 0.2s; }
+  .card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-3px); }
+  .card-icon { font-size: 2rem; margin-bottom: 12px; }
+  .card h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .card p { font-size: 0.875rem; color: var(--gray-600); }
+
+  /* COURSE */
+  #course { background: var(--gray-50); }
+  .price-card {
+    background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+    color: white; border-radius: 20px; padding: 36px; text-align: center;
+    max-width: 420px; margin: 0 auto 56px; box-shadow: var(--shadow-lg);
+  }
+  .price-card .price { font-size: 3.5rem; font-weight: 900; }
+  .price-card .price sup { font-size: 1.5rem; vertical-align: super; }
+  .price-card .price-label { color: rgba(255,255,255,0.7); font-size: 0.875rem; margin-top: -8px; margin-bottom: 20px; }
+  .price-features { text-align: left; margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+  .price-feature { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+  .price-feature::before { content: '✓'; color: #86efac; font-weight: 800; }
+  .price-btn { width: 100%; background: var(--gold); color: var(--gray-900); border: none; padding: 16px; border-radius: 10px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
+  .price-btn:hover { background: #fbbf24; transform: scale(1.02); }
+  .modules { display: flex; flex-direction: column; gap: 16px; }
+  .module { background: white; border: 1px solid var(--gray-200); border-radius: var(--border-radius); overflow: hidden; transition: all 0.2s; }
+  .module.locked { opacity: 0.65; }
+  .module-header { display: flex; align-items: center; gap: 16px; padding: 20px 24px; cursor: pointer; user-select: none; }
+  .module-num { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+  .module.locked .module-num { background: var(--gray-400); }
+  .module-title { flex: 1; font-weight: 700; color: var(--gray-900); }
+  .module-duration { font-size: 0.8rem; color: var(--gray-400); margin-right: 8px; }
+  .module-body { padding: 0 24px 20px 76px; display: none; }
+  .module-body.open { display: block; }
+  .module-body ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .module-body li { font-size: 0.9rem; color: var(--gray-600); display: flex; align-items: flex-start; gap: 8px; }
+  .module-body li::before { content: '▸'; color: var(--accent); flex-shrink: 0; }
+
+  /* STATES */
+  #states { background: white; }
+  .states-controls { display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+  .search-box { flex: 1; min-width: 220px; padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: 10px; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+  .search-box:focus { border-color: var(--accent); }
+  .filter-select { padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: 10px; font-size: 0.875rem; background: white; outline: none; cursor: pointer; }
+  .filter-select:focus { border-color: var(--accent); }
+  .states-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+  .state-card { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--border-radius); padding: 20px; transition: all 0.2s; cursor: pointer; }
+  .state-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+  .state-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .state-name { font-weight: 800; color: var(--gray-900); font-size: 1.05rem; }
+  .state-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-easy { background: #d1fae5; color: #065f46; }
+  .badge-moderate { background: #fef3c7; color: #92400e; }
+  .badge-complex { background: #fee2e2; color: #991b1b; }
+  .state-details { font-size: 0.82rem; color: var(--gray-600); display: flex; flex-direction: column; gap: 4px; }
+  .state-detail { display: flex; gap: 8px; }
+  .state-detail strong { color: var(--gray-800); min-width: 100px; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: white; border-radius: 20px; max-width: 620px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 36px; position: relative; }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: var(--gray-100); border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+  .modal h3 { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 20px; }
+  .modal-section { margin-bottom: 20px; }
+  .modal-section h4 { font-weight: 700; color: var(--gray-800); margin-bottom: 8px; font-size: 0.95rem; }
+  .modal-section p, .modal-section li { font-size: 0.9rem; color: var(--gray-600); line-height: 1.7; }
+  .modal-section ul { padding-left: 20px; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .tag { background: var(--gray-100); color: var(--gray-700); padding: 4px 12px; border-radius: 99px; font-size: 0.78rem; font-weight: 500; }
+
+  /* BUSINESS PLAN */
+  #businessplan { background: linear-gradient(180deg, #f0fdf4 0%, white 100%); }
+  .plan-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; align-items: start; }
+  .plan-toc { background: white; border: 1px solid var(--gray-200); border-radius: var(--border-radius); padding: 24px; position: sticky; top: 140px; }
+  .plan-toc h3 { font-weight: 700; color: var(--gray-900); margin-bottom: 16px; font-size: 0.95rem; }
+  .plan-toc-items { display: flex; flex-direction: column; gap: 8px; }
+  .plan-toc-item { font-size: 0.85rem; color: var(--accent); font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .plan-toc-item:hover { color: var(--primary); }
+  .plan-section { background: white; border: 1px solid var(--gray-200); border-radius: var(--border-radius); padding: 28px; margin-bottom: 20px; }
+  .plan-section h3 { font-weight: 800; color: var(--primary); margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--gray-100); }
+  .plan-section p, .plan-section li { font-size: 0.9rem; color: var(--gray-600); line-height: 1.8; }
+  .plan-section ul { padding-left: 20px; margin-top: 8px; }
+  .plan-highlight { background: #f0fdf4; border-left: 4px solid var(--accent); border-radius: 8px; padding: 16px; margin: 12px 0; font-size: 0.875rem; color: var(--gray-700); }
+
+  /* DOS AND DONTS */
+  #dosdont { background: white; }
+  .dd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .dd-col-header { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .dd-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 10px; margin-bottom: 10px; font-size: 0.875rem; }
+  .dd-do { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--gray-700); }
+  .dd-dont { background: #fef2f2; border: 1px solid #fecaca; color: var(--gray-700); }
+  .dd-check { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+  .dd-do .dd-check { background: #10b981; color: white; }
+  .dd-dont .dd-check { background: #ef4444; color: white; }
+
+  /* BARRIERS */
+  #barriers { background: var(--gray-50); }
+  .barriers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .barrier-card { background: var(--gray-50); border-left: 4px solid #ef4444; border-radius: var(--border-radius); padding: 24px; }
+  .barrier-card.warning { border-left-color: var(--gold); }
+  .barrier-card.info { border-left-color: var(--accent); }
+  .barrier-card h3 { font-weight: 700; color: var(--gray-900); margin-bottom: 8px; font-size: 1rem; }
+  .barrier-card p { font-size: 0.875rem; color: var(--gray-600); }
+
+  /* MARKETING */
+  #marketing { background: white; }
+  .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .resource-card { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--border-radius); padding: 28px; transition: all 0.2s; }
+  .resource-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-3px); }
+  .resource-icon { font-size: 2.5rem; margin-bottom: 16px; }
+  .resource-card h3 { font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .resource-card p { font-size: 0.875rem; color: var(--gray-600); }
+
+  /* CHAT */
+  #chatroom { background: var(--gray-900); color: white; }
+  #chatroom h2 { color: white; }
+  #chatroom .section-sub { color: var(--gray-400); }
+  #chatroom .divider { background: var(--accent-light); }
+  .chat-container { background: var(--gray-800); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+  .chat-header { background: var(--primary); padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+  .chat-dot { width: 10px; height: 10px; background: #86efac; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+  .chat-title { font-weight: 700; color: white; }
+  .online-count { font-size: 0.78rem; color: rgba(255,255,255,0.7); margin-left: auto; }
+  .chat-body { height: 360px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .chat-msg { display: flex; gap: 10px; }
+  .chat-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; }
+  .chat-bubble { background: rgba(255,255,255,0.07); border-radius: 12px; padding: 10px 14px; max-width: 70%; }
+  .chat-user { font-size: 0.75rem; font-weight: 600; color: var(--accent-light); margin-bottom: 4px; }
+  .chat-text { font-size: 0.875rem; color: rgba(255,255,255,0.9); }
+  .chat-time { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .chat-msg.mine { flex-direction: row-reverse; }
+  .chat-msg.mine .chat-bubble { background: rgba(16,185,129,0.3); }
+  .chat-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .chat-name-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .chat-name-input { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px 14px; color: white; font-size: 0.875rem; outline: none; }
+  .chat-name-input::placeholder { color: rgba(255,255,255,0.3); }
+  .chat-input-row { display: flex; gap: 10px; }
+  .chat-input { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 16px; color: white; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-input::placeholder { color: rgba(255,255,255,0.3); }
+  .chat-send { background: var(--accent); border: none; border-radius: 10px; padding: 12px 20px; color: white; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+  .chat-send:hover { background: var(--primary); color: white; }
+
+  /* INQUIRY */
+  #inquiry { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); color: white; }
+  #inquiry h2 { color: white; }
+  #inquiry .section-sub { color: rgba(255,255,255,0.75); }
+  #inquiry .divider { background: var(--accent-light); }
+  .inquiry-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 48px; align-items: start; }
+  .inquiry-info h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; }
+  .inquiry-info ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .inquiry-info li { display: flex; align-items: flex-start; gap: 12px; font-size: 0.9rem; color: rgba(255,255,255,0.85); }
+  .inquiry-info li::before { content: '✉'; }
+  .inquiry-form { background: white; border-radius: 20px; padding: 36px; color: var(--gray-800); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border: 2px solid var(--gray-200); border-radius: 10px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; font-family: inherit; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group textarea { min-height: 120px; resize: vertical; }
+  .form-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .form-submit:hover { background: var(--primary-dark); }
+  .form-success { display: none; text-align: center; padding: 24px; color: var(--accent); font-weight: 600; font-size: 1.1rem; }
+
+  /* FOOTER */
+  footer { background: var(--gray-900); color: var(--gray-400); text-align: center; padding: 48px 24px; font-size: 0.875rem; }
+  footer .footer-logo { font-size: 1.3rem; font-weight: 800; color: white; margin-bottom: 8px; }
+  footer .footer-logo span { color: var(--accent-light); }
+  footer p { margin-bottom: 4px; }
+  footer .footer-links { display: flex; justify-content: center; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
+  footer .footer-links a { color: var(--gray-400); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
+  footer .footer-links a:hover { color: var(--accent-light); }
+  .disclaimer { max-width: 800px; margin: 16px auto 0; font-size: 0.75rem; color: var(--gray-600); line-height: 1.6; }
+
+  /* PAYMENT MODAL */
+  .modal-overlay.payment-modal .modal { max-width: 500px; }
+  .enroll-success { display: none; text-align: center; padding: 32px; }
+  .enroll-success .big-check { font-size: 4rem; margin-bottom: 16px; }
+  .enroll-success h3 { color: var(--accent); font-size: 1.4rem; margin-bottom: 8px; }
+
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .nav-links.open { display: flex; flex-direction: column; position: absolute; top: 64px; left: 0; right: 0; background: var(--primary-dark); padding: 16px; z-index: 999; }
+    section { padding: 56px 16px; }
+    .dd-grid { grid-template-columns: 1fr; }
+    .plan-layout { grid-template-columns: 1fr; }
+    .plan-toc { position: static; }
+    .inquiry-layout { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="regium-academy.html" class="logo">Permit Runner <span>Academy</span> <small style="font-size:0.5rem;font-weight:400;opacity:0.7;letter-spacing:1px;text-transform:uppercase">by Regium</small></a>
+    <div class="nav-links" id="navLinks">
+      <a href="regium-academy.html" style="color:var(--accent-light);font-weight:600">← All Departments</a>
+      <a href="#who">Who Needs It</a>
+      <a href="#course">Course</a>
+      <a href="#states">All 50 States</a>
+      <a href="#businessplan">Business Plan</a>
+      <a href="#dosdont">Do's & Don'ts</a>
+      <a href="#marketing">Marketing</a>
+      <a href="#chatroom">Community</a>
+      <a href="#inquiry">Contact</a>
+      <a href="#course" class="nav-cta">Enroll – $14.99</a>
+    </div>
+    <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<!-- DEPT TABS -->
+<div class="dept-tabs">
+  <div class="dept-tabs-inner">
+    <a href="regium-academy.html" class="dept-tab">🏛️ All Departments</a>
+    <a href="inkprint-academy.html" class="dept-tab">🖐️ InkPrint Academy</a>
+    <a href="permit-runner-academy.html" class="dept-tab active">📋 Permit Runner Academy</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🎓 Self-Paced · All 50 States</div>
+    <h1>Launch Your<br><span>Permit Running Business</span></h1>
+    <p>Learn everything you need to become a professional permit expediter in any state — requirements, startup steps, business plan, marketing, and more.</p>
+    <div class="hero-cta-group">
+      <a href="#course" class="btn-primary">🚀 Enroll Now – $14.99</a>
+      <a href="#course" class="btn-outline">View Curriculum</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">50</div><div class="stat-label">States Covered</div></div>
+      <div class="stat"><div class="stat-num">8</div><div class="stat-label">Course Modules</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Lifetime Access</div></div>
+      <div class="stat"><div class="stat-num">$14.99</div><div class="stat-label">One-Time Fee</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO NEEDS IT -->
+<section id="who" style="background:white">
+  <div class="section-inner">
+    <div class="section-label">Market Opportunity</div>
+    <h2>Who Needs Permit Running Services?</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Permit runners save clients hours — sometimes weeks — of standing in lines and navigating bureaucracy. The demand is constant and growing.</p>
+    <div class="cards-grid">
+      <div class="card"><div class="card-icon">🏗️</div><h3>General Contractors</h3><p>Builders and GCs need permits pulled constantly — new construction, additions, renovations, and electrical/plumbing work across every project.</p></div>
+      <div class="card"><div class="card-icon">🏠</div><h3>Real Estate Developers</h3><p>Developers juggle dozens of projects simultaneously and outsource permit running to stay on schedule and avoid costly delays.</p></div>
+      <div class="card"><div class="card-icon">⚡</div><h3>Electricians & Plumbers</h3><p>Licensed trades pull permits for virtually every job. A reliable permit runner is invaluable to a busy subcontractor who can't spend half a day at the permit office.</p></div>
+      <div class="card"><div class="card-icon">🏢</div><h3>Commercial Businesses</h3><p>Restaurants, retail stores, and offices need signage permits, fire inspection permits, health department permits, and occupancy permits.</p></div>
+      <div class="card"><div class="card-icon">🚗</div><h3>Auto Dealers & DMV Work</h3><p>In many states, permit runners handle title transfers, dealer plates, and DMV filings on behalf of car dealerships.</p></div>
+      <div class="card"><div class="card-icon">🏛️</div><h3>Law Firms & Title Companies</h3><p>Attorneys and title companies use permit runners to pull lien searches, zoning certificates, and certificate of occupancy records.</p></div>
+      <div class="card"><div class="card-icon">🎪</div><h3>Event Organizers</h3><p>Special event permits, temporary food permits, noise waivers, and street closure permits require expediting for time-sensitive events.</p></div>
+      <div class="card"><div class="card-icon">🌿</div><h3>Landscapers & Solar Installers</h3><p>Landscaping, irrigation, and solar installation often require zoning, HOA, and municipal permits that clients don't want to handle themselves.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSE -->
+<section id="course">
+  <div class="section-inner">
+    <div class="section-label">Self-Paced Training</div>
+    <h2>Complete Permit Runner Course</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Work through each module on your own schedule. No deadlines. Lifetime access. One low price.</p>
+    <div class="price-card">
+      <div class="price"><sup>$</sup>14.99</div>
+      <div class="price-label">One-time payment · Lifetime access</div>
+      <div class="price-features">
+        <div class="price-feature">All 8 course modules (self-paced)</div>
+        <div class="price-feature">All 50 state permit requirement guides</div>
+        <div class="price-feature">Sample business plan template</div>
+        <div class="price-feature">Do's & don'ts for permit runners</div>
+        <div class="price-feature">Marketing & client acquisition playbook</div>
+        <div class="price-feature">Community chat room access</div>
+        <div class="price-feature">Certificate of Completion</div>
+      </div>
+      <button class="price-btn" onclick="openPayment()">🚀 Enroll Now for $14.99</button>
+    </div>
+    <div class="modules" id="modulesContainer">
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header"><div class="module-num">1</div><div class="module-title">What Is Permit Running? Industry Overview</div><span class="module-duration">~40 min</span><span>▴</span></div>
+        <div class="module-body open"><ul>
+          <li>The permit expediting industry — size, scope, and opportunity</li>
+          <li>Types of permits: building, zoning, health, fire, event, DMV, and more</li>
+          <li>Difference between a permit runner, permit expediter, and permit service</li>
+          <li>The permit process from application to approval — step by step</li>
+          <li>Why contractors and developers outsource this work</li>
+        </ul></div>
+      </div>
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header"><div class="module-num">2</div><div class="module-title">How to Get Started in Your State</div><span class="module-duration">~60 min</span><span>▾</span></div>
+        <div class="module-body"><ul>
+          <li>Does your state require a license to run permits? (full breakdown)</li>
+          <li>How to register as a permit service with your local building department</li>
+          <li>Getting your business license, EIN, and LLC set up</li>
+          <li>Building department orientation — who to know, how to navigate the office</li>
+          <li>Setting up online portal access with your municipality</li>
+          <li>First steps checklist: what to do in your first 30 days</li>
+        </ul></div>
+      </div>
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header"><div class="module-num">3</div><div class="module-title">All 50 State Requirements</div><span class="module-duration">~90 min</span><span>🔒</span></div>
+        <div class="module-body"><ul>
+          <li>State-by-state licensing and registration requirements</li>
+          <li>States requiring a contractor's license to pull permits (and workarounds)</li>
+          <li>States with open permit-runner markets vs. restricted markets</li>
+          <li>Municipal vs. county vs. state permit jurisdictions explained</li>
+          <li>Key contacts and portals for each state's building authority</li>
+        </ul></div>
+      </div>
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header"><div class="module-num">4</div><div class="module-title">Reading & Submitting Permit Applications</div><span class="module-duration">~75 min</span><span>🔒</span></div>
+        <div class="module-body"><ul>
+          <li>How to read permit applications and site plans accurately</li>
+          <li>Common document requirements: surveys, NOC, contractor license, insurance</li>
+          <li>How to avoid rejection — the most common submission errors</li>
+          <li>Online vs. in-person submission: strategies by jurisdiction</li>
+          <li>Tracking permit status and following up with reviewers professionally</li>
+        </ul></div>
+      </div>
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header"><div class="module-num">5</div><div class="module-title">Business Plan & Financial Setup</div><span class="module-duration">~60 min</span><span>🔒</span></div>
+        <div class="module-body"><ul>
+          <li>Writing your permit running business plan (template walkthrough)</li>
+          <li>Pricing structures: per-permit, retainer, rush fees</li>
+          <li>Startup cost breakdown and equipment needs</li>
+          <li>Invoicing, contracts, and getting paid on time</li>
+          <li>Bookkeeping basics for a permit service business</li>
+        </ul></div>
+      </div>
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header"><div class="module-num">6</div><div class="module-title">Common Barriers & How to Overcome Them</div><span class="module-duration">~50 min</span><span>🔒</span></div>
+        <div class="module-body"><ul>
+          <li>States that restrict who can pull permits without a contractor's license</li>
+          <li>Handling permit rejections, plan review comments, and appeals</li>
+          <li>Dealing with difficult inspectors and department staff</li>
+          <li>Insurance and bonding requirements by state</li>
+          <li>Digital vs. paper-only jurisdictions and how to manage both</li>
+        </ul></div>
+      </div>
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header"><div class="module-num">7</div><div class="module-title">Marketing & Growing Your Client Base</div><span class="module-duration">~80 min</span><span>🔒</span></div>
+        <div class="module-body"><ul>
+          <li>How to find and approach contractors, developers, and trades</li>
+          <li>Canvassing construction sites and building supply stores</li>
+          <li>Google Business Profile and local SEO for permit services</li>
+          <li>Referral programs and strategic partnerships</li>
+          <li>Pricing packages for volume clients and retainer agreements</li>
+          <li>Email marketing and follow-up sequences that convert</li>
+        </ul></div>
+      </div>
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header"><div class="module-num">8</div><div class="module-title">Certification & Final Assessment</div><span class="module-duration">~30 min</span><span>🔒</span></div>
+        <div class="module-body"><ul>
+          <li>Course knowledge review and final quiz</li>
+          <li>Printable Regium Academy Certificate of Completion</li>
+          <li>Building your professional online presence as a permit runner</li>
+          <li>Resources for staying current with changing permit laws by state</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ALL 50 STATES -->
+<section id="states">
+  <div class="section-inner">
+    <div class="section-label">State-by-State Breakdown</div>
+    <h2>Permit Running Requirements — All 50 States</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Click any state for a detailed breakdown of requirements, licensing, permit types, and key agencies.</p>
+    <div class="states-controls">
+      <input type="text" class="search-box" id="stateSearch" placeholder="🔍 Search state..." oninput="filterStates()">
+      <select class="filter-select" id="typeFilter" onchange="filterStates()">
+        <option value="">All Complexity Levels</option>
+        <option value="easy">Easy Entry</option>
+        <option value="moderate">Moderate Requirements</option>
+        <option value="complex">Complex / Restricted</option>
+      </select>
+    </div>
+    <div class="states-grid" id="statesGrid"></div>
+  </div>
+</section>
+
+<!-- BUSINESS PLAN -->
+<section id="businessplan">
+  <div class="section-inner">
+    <div class="section-label">Sample Template</div>
+    <h2>Permit Running Business Plan</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Use this template as your starting point. Customize each section with your local market, rates, and target clients.</p>
+    <div class="plan-layout">
+      <div class="plan-toc">
+        <h3>📋 Plan Sections</h3>
+        <div class="plan-toc-items">
+          <a class="plan-toc-item" href="#bp1">1. Executive Summary</a>
+          <a class="plan-toc-item" href="#bp2">2. Business Description</a>
+          <a class="plan-toc-item" href="#bp3">3. Market Analysis</a>
+          <a class="plan-toc-item" href="#bp4">4. Services & Pricing</a>
+          <a class="plan-toc-item" href="#bp5">5. Marketing Strategy</a>
+          <a class="plan-toc-item" href="#bp6">6. Operations</a>
+          <a class="plan-toc-item" href="#bp7">7. Financial Projections</a>
+          <a class="plan-toc-item" href="#bp8">8. Goals & Milestones</a>
+        </div>
+      </div>
+      <div>
+        <div class="plan-section" id="bp1">
+          <h3>1. Executive Summary</h3>
+          <p><strong>[Your Business Name]</strong> is a professional permit expediting service based in <strong>[City, State]</strong>. We specialize in obtaining building, zoning, health, fire, and specialty permits on behalf of contractors, developers, and businesses throughout <strong>[Service Area]</strong>. Our goal is to reduce permit turnaround time and administrative burden for clients so they can focus on their core work.</p>
+          <div class="plan-highlight">💡 Keep this to 1–2 paragraphs. It should summarize your whole plan — write it last.</div>
+        </div>
+        <div class="plan-section" id="bp2">
+          <h3>2. Business Description</h3>
+          <p><strong>Legal Structure:</strong> [LLC / Sole Proprietor / S-Corp]<br>
+          <strong>Owner(s):</strong> [Your Name]<br>
+          <strong>Founded:</strong> [Year]<br>
+          <strong>Location:</strong> [Home-based / Office Address]<br>
+          <strong>Service Area:</strong> [Counties / Cities / Statewide]</p>
+          <p style="margin-top:12px">We provide permit running services to clients who cannot afford the time or resources to navigate local permitting offices. We act as the client's authorized agent to submit applications, track status, respond to reviewer comments, and obtain approved permits in the shortest possible time.</p>
+        </div>
+        <div class="plan-section" id="bp3">
+          <h3>3. Market Analysis</h3>
+          <p><strong>Target Clients:</strong></p>
+          <ul>
+            <li>General contractors and homebuilders (primary market)</li>
+            <li>Specialty contractors — electricians, plumbers, HVAC, solar installers</li>
+            <li>Real estate developers and property management companies</li>
+            <li>Retail businesses, restaurants, and commercial tenants</li>
+            <li>Law firms and title companies requiring lien/zoning searches</li>
+          </ul>
+          <div class="plan-highlight">📊 Research your local market: How many active contractors are in your county? Check your state's contractor license database for a count — that's your addressable market.</div>
+          <p style="margin-top:12px"><strong>Competition:</strong> In most markets there are few dedicated permit runners. Most competition comes from general office assistants or contractors doing it themselves. A professional, reliable service can capture significant market share quickly.</p>
+        </div>
+        <div class="plan-section" id="bp4">
+          <h3>4. Services & Pricing</h3>
+          <ul>
+            <li><strong>Standard Permit Running:</strong> $75–$150 per permit (simple residential)</li>
+            <li><strong>Commercial Permit Running:</strong> $150–$400 per permit (plans review required)</li>
+            <li><strong>Rush/Expedited Service:</strong> Standard fee + 50–100% rush surcharge</li>
+            <li><strong>Monthly Retainer:</strong> $500–$2,000/month for high-volume contractors</li>
+            <li><strong>Lien/Zoning Research:</strong> $50–$125 per search</li>
+            <li><strong>DMV/Title Running (if applicable):</strong> $35–$85 per transaction</li>
+          </ul>
+          <div class="plan-highlight">💰 Tip: Retainer clients are your best revenue — even 3–4 retainer clients at $700/month = $2,100–$2,800 recurring monthly income before any per-permit work.</div>
+        </div>
+        <div class="plan-section" id="bp5">
+          <h3>5. Marketing Strategy</h3>
+          <ul>
+            <li>Google Business Profile — optimized for "permit runner near me" and "permit expediter [city]"</li>
+            <li>Canvass active construction sites — introduce yourself to the GC or site super</li>
+            <li>Visit building supply stores (Home Depot Pro desk, lumber yards) and leave cards</li>
+            <li>Partner with contractor licensing schools and trade associations</li>
+            <li>Reach out to local real estate investor groups and developer associations</li>
+            <li>LinkedIn outreach to construction project managers and developers</li>
+            <li>Referral incentive: $25 credit per referred client who places an order</li>
+          </ul>
+        </div>
+        <div class="plan-section" id="bp6">
+          <h3>6. Operations</h3>
+          <p><strong>Equipment Needed:</strong></p>
+          <ul>
+            <li>Reliable vehicle (mileage is tax-deductible)</li>
+            <li>Laptop or tablet for online portal submissions</li>
+            <li>Scanner/printer for document preparation</li>
+            <li>Filing system (physical and digital) for client records</li>
+            <li>Business phone line or Google Voice number</li>
+          </ul>
+          <p style="margin-top:12px"><strong>Workflow:</strong> Client places order → You collect required documents → Submit application (in-person or online) → Track status → Respond to reviewer comments → Deliver approved permit to client → Invoice and collect payment.</p>
+          <div class="plan-highlight">⚙️ Startup cost estimate: $300–$800 total for business registration, insurance, scanner, and basic supplies.</div>
+        </div>
+        <div class="plan-section" id="bp7">
+          <h3>7. Financial Projections (Year 1)</h3>
+          <ul>
+            <li><strong>Month 1–2:</strong> Setup phase. 5–10 permits/month. Revenue: ~$500–$1,200</li>
+            <li><strong>Month 3–4:</strong> Building clientele. 15–25 permits/month. Revenue: ~$1,500–$3,000</li>
+            <li><strong>Month 5–6:</strong> First retainer client. Revenue: ~$3,000–$5,000/month</li>
+            <li><strong>Month 7–12:</strong> 2–4 retainer clients + per-permit work. Revenue: ~$4,000–$8,000/month</li>
+          </ul>
+          <p style="margin-top:12px"><strong>Annual Year 1 Goal:</strong> $30,000–$60,000 gross revenue<br>
+          <strong>Expenses:</strong> ~$5,000–$10,000 (insurance, mileage, marketing, tools)<br>
+          <strong>Net Profit:</strong> ~$20,000–$50,000 Year 1</p>
+        </div>
+        <div class="plan-section" id="bp8">
+          <h3>8. Goals & Milestones</h3>
+          <ul>
+            <li>✅ Day 1–30: Business registered, insurance obtained, building department accounts opened</li>
+            <li>✅ Day 30–60: First 10 paying clients, Google Business Profile live</li>
+            <li>✅ Day 60–90: First retainer agreement signed</li>
+            <li>✅ Month 6: Revenue covering all personal expenses</li>
+            <li>✅ Month 12: Hire first part-time runner to handle overflow</li>
+            <li>✅ Year 2: Expand to additional counties or hire a second runner</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DO'S AND DON'TS -->
+<section id="dosdont">
+  <div class="section-inner">
+    <div class="section-label">Professional Standards</div>
+    <h2>Do's & Don'ts for Permit Runners</h2>
+    <div class="divider"></div>
+    <p class="section-sub">These rules separate the professionals from those who burn bridges and lose clients.</p>
+    <div class="dd-grid">
+      <div>
+        <div class="dd-col-header" style="color:#065f46">✅ Do's</div>
+        <div class="dd-item dd-do"><div class="dd-check">✓</div><div>Always confirm the exact documents required before visiting the permit office — requirements vary by municipality and permit type.</div></div>
+        <div class="dd-item dd-do"><div class="dd-check">✓</div><div>Build relationships with building department staff. Being respectful and professional gets your submissions prioritized.</div></div>
+        <div class="dd-item dd-do"><div class="dd-check">✓</div><div>Communicate proactively with clients — update them on status changes without them having to ask.</div></div>
+        <div class="dd-item dd-do"><div class="dd-check">✓</div><div>Keep copies of every document you submit, stamped approvals, and all correspondence. Paper trails protect you.</div></div>
+        <div class="dd-item dd-do"><div class="dd-check">✓</div><div>Use written service agreements for every client — even repeat customers. Define scope, fees, and timelines clearly.</div></div>
+        <div class="dd-item dd-do"><div class="dd-check">✓</div><div>Verify that your client's contractor license is active before submitting permits requiring one — rejections waste everyone's time.</div></div>
+        <div class="dd-item dd-do"><div class="dd-check">✓</div><div>Learn the online submission portals in your area. Jurisdictions increasingly prefer digital — get ahead of this curve.</div></div>
+        <div class="dd-item dd-do"><div class="dd-check">✓</div><div>Carry general liability insurance. It protects you if a permit error causes a project delay and the client seeks damages.</div></div>
+      </div>
+      <div>
+        <div class="dd-col-header" style="color:#991b1b">❌ Don'ts</div>
+        <div class="dd-item dd-dont"><div class="dd-check">✗</div><div>Never guarantee approval timelines you can't control. Permit offices set their own review schedules — underpromise and overdeliver.</div></div>
+        <div class="dd-item dd-dont"><div class="dd-check">✗</div><div>Don't attempt to pull permits that legally require the contractor's license in restricted states — this exposes both you and your client.</div></div>
+        <div class="dd-item dd-dont"><div class="dd-check">✗</div><div>Never submit incomplete applications. A missing document wastes days and damages your reputation with building department staff.</div></div>
+        <div class="dd-item dd-dont"><div class="dd-check">✗</div><div>Don't ignore plan review comments. Respond quickly with clear corrections — delays compound fast.</div></div>
+        <div class="dd-item dd-dont"><div class="dd-check">✗</div><div>Never be combative with permit office staff. They have discretion in how fast they process your submissions.</div></div>
+        <div class="dd-item dd-dont"><div class="dd-check">✗</div><div>Don't take on more work than you can handle. A missed deadline on a commercial project can cause thousands in client losses.</div></div>
+        <div class="dd-item dd-dont"><div class="dd-check">✗</div><div>Never operate without a written client agreement. Verbal deals end in disputes over fees, scope, and responsibility.</div></div>
+        <div class="dd-item dd-dont"><div class="dd-check">✗</div><div>Don't neglect record keeping. The IRS, a client dispute, or an audit can come at any time — clean records protect your business.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BARRIERS -->
+<section id="barriers" style="background:var(--gray-50)">
+  <div class="section-inner">
+    <div class="section-label">Know Before You Start</div>
+    <h2>Common Barriers for Permit Runners</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Being aware of these issues upfront will save you time, money, and legal trouble.</p>
+    <div class="barriers-grid">
+      <div class="barrier-card">
+        <h3>🔴 Contractor License Restrictions</h3>
+        <p>In states like California, Florida, and New York, certain permit types can only be pulled by the licensed contractor of record — not a third-party runner. Understand the rules in your state before marketing those services.</p>
+      </div>
+      <div class="barrier-card">
+        <h3>🔴 Unauthorized Practice of Law</h3>
+        <p>If a permit issue escalates to a variance hearing or zoning board appeal, that may cross into legal practice. Refer those situations to a land use attorney — never represent a client in legal proceedings without a license.</p>
+      </div>
+      <div class="barrier-card warning">
+        <h3>🟡 Jurisdiction Fragmentation</h3>
+        <p>In most states, permits are issued at the city or county level — not the state level. Requirements, portals, and processing times vary dramatically even within the same county. Plan to invest time learning each jurisdiction you serve.</p>
+      </div>
+      <div class="barrier-card warning">
+        <h3>🟡 Online Portal Lockouts</h3>
+        <p>Many municipalities now require contractor-registered portal accounts to submit permits electronically. If your client doesn't share access, you may have to submit in person. Always clarify portal access with your client upfront.</p>
+      </div>
+      <div class="barrier-card warning">
+        <h3>🟡 Slow Municipal Review Times</h3>
+        <p>Plan review timelines range from 1 business day (small towns) to 8–12 weeks (major cities like Miami or LA). Set client expectations based on your specific municipality — never promise timelines you can't control.</p>
+      </div>
+      <div class="barrier-card info">
+        <h3>🟣 Insurance Requirements</h3>
+        <p>Some municipalities and clients require proof of general liability insurance (typically $1M minimum) before accepting you as an authorized agent. Budget $400–$800/year for a basic GL policy for your permit service business.</p>
+      </div>
+      <div class="barrier-card info">
+        <h3>🟣 Scope Creep</h3>
+        <p>Clients may ask you to interpret plans, advise on building codes, or recommend contractors — tasks outside your role. Stick to your lane: submit, track, deliver. Refer technical questions to licensed professionals.</p>
+      </div>
+      <div class="barrier-card info">
+        <h3>🟣 Permit Expirations</h3>
+        <p>Most permits expire if work doesn't begin within 180 days, or if inspections aren't passed on schedule. Track expiration dates for your clients and notify them proactively — an expired permit means starting the process over.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARKETING -->
+<section id="marketing" style="background:white">
+  <div class="section-inner">
+    <div class="section-label">Client Acquisition</div>
+    <h2>Marketing Your Permit Running Business</h2>
+    <div class="divider"></div>
+    <p class="section-sub">The best permit runners build thriving businesses through relationships, visibility, and consistency — not advertising spend.</p>
+    <div class="resources-grid">
+      <div class="resource-card"><div class="resource-icon">📍</div><h3>Google Business Profile</h3><p>Your #1 free tool. Set up and fully optimize your profile with "permit runner," "permit expediter," and "permit service" in your description. Post weekly updates. Collect Google reviews from every client.</p></div>
+      <div class="resource-card"><div class="resource-icon">🏗️</div><h3>Canvass Active Job Sites</h3><p>Drive around your area and identify active construction. Introduce yourself to the site superintendent or GC. Hand them a card and a simple one-page rate sheet. Follow up within 1 week.</p></div>
+      <div class="resource-card"><div class="resource-icon">🏪</div><h3>Building Supply Stores</h3><p>Ask to leave business cards at the contractor pro desk at Home Depot, Lowe's, and local lumber yards. These are daily stops for your target clients. Bring donuts — it works.</p></div>
+      <div class="resource-card"><div class="resource-icon">🤝</div><h3>Contractor License Schools</h3><p>Partner with local contractor licensing prep schools to hand out cards to new licensees. New contractors don't yet know how to navigate permit offices — you're solving an immediate problem for them.</p></div>
+      <div class="resource-card"><div class="resource-icon">📊</div><h3>Real Estate Investor Groups</h3><p>Attend local REIA (Real Estate Investor Association) meetings. Investors doing fix-and-flip or new construction are high-volume, repeat permit clients. One good contact here can mean dozens of orders.</p></div>
+      <div class="resource-card"><div class="resource-icon">💼</div><h3>LinkedIn Outreach</h3><p>Search "general contractor [your city]" and "project manager construction [your city]" on LinkedIn. Send short, direct connection messages. Offer a free first permit run to earn the relationship.</p></div>
+      <div class="resource-card"><div class="resource-icon">📧</div><h3>Email Follow-Up Sequence</h3><p>After every first meeting or card handout, send a 3-email sequence over 2 weeks: (1) Nice to meet you recap, (2) Your rate sheet + testimonial, (3) Final follow-up with a specific call to action. Most clients book after email 2 or 3.</p></div>
+      <div class="resource-card"><div class="resource-icon">💰</div><h3>Referral Program</h3><p>Offer existing clients $25 account credit or a free permit run for every new paying client they refer. Word-of-mouth referrals from happy contractors are worth more than any ad spend.</p></div>
+      <div class="resource-card"><div class="resource-icon">📋</div><h3>Retainer Proposals</h3><p>After completing 3–5 orders for a client, pitch a monthly retainer. "For $700/month I'll handle all your permit running with priority turnaround." This converts volume clients into predictable recurring revenue.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAT ROOM -->
+<section id="chatroom">
+  <div class="section-inner">
+    <div class="section-label">Community</div>
+    <h2>Permit Runner Community Chat</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Share strategies, ask questions, and connect with permit runners across the country.</p>
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="chat-dot"></div>
+        <div class="chat-title">Permit Runner Academy — Community</div>
+        <div class="online-count">🟢 <span id="onlineNum">11</span> online</div>
+      </div>
+      <div class="chat-body" id="chatBody"></div>
+      <div class="chat-footer">
+        <div class="chat-name-row">
+          <input type="text" class="chat-name-input" id="chatName" placeholder="Your name or nickname" maxlength="30">
+        </div>
+        <div class="chat-input-row">
+          <input type="text" class="chat-input" id="chatInput" placeholder="Share a tip, ask a question..." maxlength="300" onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">Send ➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INQUIRY FORM -->
+<section id="inquiry">
+  <div class="section-inner">
+    <div class="section-label">Get Answers</div>
+    <h2>Submit an Inquiry</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Questions about permit running requirements in your state? We're here to help.</p>
+    <div class="inquiry-layout">
+      <div class="inquiry-info">
+        <h3>We're here to help</h3>
+        <ul>
+          <li>State-specific permit running requirements</li>
+          <li>Starting your permit running business</li>
+          <li>How to approach your local building department</li>
+          <li>Pricing and service structure questions</li>
+          <li>Course and enrollment questions</li>
+        </ul>
+      </div>
+      <div class="inquiry-form" id="inquiryFormContainer">
+        <form id="inquiryForm" onsubmit="submitInquiry(event)">
+          <div class="form-row">
+            <div class="form-group"><label>First Name *</label><input type="text" required placeholder="Jane"></div>
+            <div class="form-group"><label>Last Name *</label><input type="text" required placeholder="Smith"></div>
+          </div>
+          <div class="form-group"><label>Email Address *</label><input type="email" required placeholder="jane@example.com"></div>
+          <div class="form-group">
+            <label>Your State</label>
+            <select><option value="">Select your state...</option>
+              <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Topic</label>
+            <select>
+              <option>State Requirements</option>
+              <option>Starting My Business</option>
+              <option>Building Department Access</option>
+              <option>Pricing & Services</option>
+              <option>Course Question</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Your Question *</label><textarea required placeholder="Describe your question in detail..."></textarea></div>
+          <button type="submit" class="form-submit">📨 Submit Inquiry</button>
+        </form>
+        <div class="form-success" id="formSuccess">
+          <div style="font-size:3rem;margin-bottom:12px">✅</div>
+          <div>Thank you! We'll respond within 1–2 business days.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Permit Runner <span>Academy</span> <small style="font-size:0.6rem;font-weight:400;opacity:0.6;letter-spacing:1px;text-transform:uppercase">by Regium</small></div>
+  <p>A Department of <a href="regium-academy.html" style="color:var(--accent-light);text-decoration:none;font-weight:600">Regium Academy</a> · Professional Permit Expediting Training</p>
+  <div class="footer-links">
+    <a href="regium-academy.html">← Regium Academy Home</a>
+    <a href="inkprint-academy.html">InkPrint Dept.</a>
+    <a href="#who">Who Needs It</a>
+    <a href="#course">Course</a>
+    <a href="#states">All 50 States</a>
+    <a href="#businessplan">Business Plan</a>
+    <a href="#dosdont">Do's & Don'ts</a>
+    <a href="#marketing">Marketing</a>
+    <a href="#chatroom">Community</a>
+    <a href="#inquiry">Contact</a>
+  </div>
+  <p class="disclaimer">Regium Academy is a division of Regium, LLC (South Carolina). Course content is educational. Permit requirements vary by municipality and change frequently — always verify with your local building authority. Regium Academy is not a licensed contractor or legal firm. © 2025 Regium, LLC. All rights reserved.</p>
+</footer>
+
+<!-- STATE MODAL -->
+<div class="modal-overlay" id="stateModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeStateModal()">✕</button>
+    <div id="stateModalContent"></div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay payment-modal" id="paymentModal">
+  <div class="modal" style="max-width:500px">
+    <button class="modal-close" onclick="closePayment()">✕</button>
+    <div id="payStep1">
+      <h3 style="font-size:1.3rem;font-weight:800;color:var(--primary);margin-bottom:6px">📋 Enroll in Permit Runner Academy</h3>
+      <p style="font-size:0.875rem;color:#6b7280;margin-bottom:24px">One-time payment of <strong style="color:var(--gray-900)">$14.99</strong> · Lifetime access · No subscription</p>
+      <button onclick="showStripeForm()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:#635bff;color:white;border:none;padding:15px;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:12px;transition:opacity 0.2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        Pay with Card (Stripe)
+      </button>
+      <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin-top:14px">🔒 Secure & encrypted · 30-day money-back guarantee</p>
+    </div>
+    <div id="payStep2" style="display:none">
+      <button onclick="document.getElementById('payStep2').style.display='none';document.getElementById('payStep1').style.display='block'" style="background:none;border:none;color:var(--accent);font-size:0.85rem;font-weight:600;cursor:pointer;margin-bottom:16px;padding:0">← Back</button>
+      <h3 style="font-size:1.2rem;font-weight:800;color:var(--primary);margin-bottom:4px">Pay with Card</h3>
+      <p style="font-size:0.875rem;color:#6b7280;margin-bottom:20px">Secure payment via <strong>Stripe</strong> · $14.99</p>
+      <div style="margin-bottom:16px">
+        <label style="font-size:0.82rem;font-weight:600;color:#374151;display:block;margin-bottom:6px">Email</label>
+        <input type="email" id="stripeEmail" placeholder="you@example.com" style="width:100%;padding:11px 13px;border:2px solid #e5e7eb;border-radius:9px;font-size:0.9rem;outline:none;" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#e5e7eb'">
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:0.82rem;font-weight:600;color:#374151;display:block;margin-bottom:6px">Card Details</label>
+        <div id="stripe-card-element" style="padding:12px 13px;border:2px solid #e5e7eb;border-radius:9px;background:white;min-height:42px"></div>
+        <div id="stripe-card-errors" style="color:#ef4444;font-size:0.8rem;margin-top:6px"></div>
+      </div>
+      <button id="stripe-pay-btn" onclick="handleStripePayment()" style="width:100%;background:#065f46;color:white;border:none;padding:14px;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">🔒 Pay $14.99</button>
+      <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin-top:10px">Powered by Stripe · Your card info is never stored on our servers</p>
+    </div>
+    <div class="enroll-success" id="enrollSuccess">
+      <div class="big-check">🎉</div>
+      <h3>You're enrolled!</h3>
+      <p style="color:#4b5563;margin-bottom:16px">Welcome to Permit Runner Academy by Regium. All modules are now unlocked. Check your email for access details.</p>
+      <button onclick="unlockModules(); closePayment();" style="background:var(--primary);color:white;border:none;padding:12px 28px;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer">Start Learning →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ STRIPE CONFIG ══
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51TdwFdH90tmu5OvoUIuCK6LFKaJ2Qj8O8YR8Au3ORLVli7Nnp6QqH4QUxycKnmqPcKhKnjnkqWTiGfh0kq5X3sug00LY6ED0kT';
+const STRIPE_PRICE_ID = 'price_1Tdz8sH90tmu5OvocPU3xbUo';
+
+// ── STATE DATA ──
+const statesData = [
+  { name: "Alabama", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, zoning", agencies: "Local building departments (city/county)", notes: "Alabama uses a decentralized system — permits are issued at the city or county level. No statewide portal. Relationships with local offices are key." },
+  { name: "Alaska", difficulty: "easy", license: "No state license required", permitTypes: "Building, fire, zoning, electrical", agencies: "AK Dept. of Labor & Workforce Dev. (commercial); local municipalities", notes: "Remote jurisdictions may require in-person submission only. Anchorage and Fairbanks have online portals." },
+  { name: "Arizona", difficulty: "easy", license: "No state license required", permitTypes: "Building, residential, commercial, zoning, fire", agencies: "Local city/county building departments", notes: "Phoenix, Scottsdale, and Tucson all have online permit portals. Fast-growing market with high permit volume." },
+  { name: "Arkansas", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical", agencies: "Local building departments", notes: "Smaller, rural-heavy state. In-person submission common in most counties outside Little Rock." },
+  { name: "California", difficulty: "complex", license: "Pulling permits requires licensed contractor signature in most categories", permitTypes: "Building, grading, plumbing, electrical, mechanical, fire, zoning", agencies: "Local building depts; CA DHCD for manufactured homes", notes: "CA is the most complex state. Most permits legally require the contractor of record to pull them. Runners assist with document prep, submittal logistics, and tracking — not signing. Know the restrictions before marketing." },
+  { name: "Colorado", difficulty: "moderate", license: "No state license required; some jurisdictions require authorization", permitTypes: "Building, zoning, electrical, fire, mechanical", agencies: "Local city/county building departments", notes: "Denver, Colorado Springs, and Aurora have online portals. Mountain resort towns (Aspen, Vail) have slow review times due to high volume." },
+  { name: "Connecticut", difficulty: "moderate", license: "No state license required for runners; contractor license needed to sign permits", permitTypes: "Building, electrical, plumbing, mechanical, fire", agencies: "Local building officials (town-by-town)", notes: "CT processes permits at the town level — 169 towns, 169 building departments. Portfolio of relationships is crucial." },
+  { name: "Delaware", difficulty: "easy", license: "No state license required", permitTypes: "Building, zoning, fire, electrical", agencies: "DEDO and local county/city building offices", notes: "Small state with three counties. Sussex County (beach resort area) has high construction permit volume." },
+  { name: "Florida", difficulty: "complex", license: "Contractor's license required to pull certain permit types; runners can assist with document prep and tracking", permitTypes: "Building, electrical, plumbing, mechanical, roofing, AC, zoning", agencies: "Local building departments; FL DBPR", notes: "FL is high-volume but complex. Miami-Dade, Broward, and Palm Beach have massive permit backlogs. Many runners specialize in one county. Strong market for roofing and hurricane-related permits." },
+  { name: "Georgia", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning", agencies: "Local county building departments", notes: "Atlanta metro has surging construction. Fulton, Cobb, Gwinnett, and Cherokee counties are high-volume permit markets." },
+  { name: "Hawaii", difficulty: "moderate", license: "No state license required", permitTypes: "Building, electrical, plumbing, zoning, grading", agencies: "County building departments (Oahu, Maui, Hawaii, Kauai)", notes: "Island logistics slow everything down. Honolulu's DPP has significant backlogs. Electronic submissions available for some permit types." },
+  { name: "Idaho", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical", agencies: "Local city/county building departments; Idaho Div. of Building Safety (electrical/plumbing)", notes: "Boise and the Treasure Valley are fast-growing markets. Idaho Division of Building Safety handles statewide electrical and plumbing permits." },
+  { name: "Illinois", difficulty: "moderate", license: "No state license required; Chicago has specific vendor registration process", permitTypes: "Building, electrical, zoning, fire, health", agencies: "Chicago BACP; local building depts downstate", notes: "Chicago's permit system is highly complex with its own online portal (E-Plan). Suburban Cook County and collar counties are more accessible. Great market for runners who master the Chicago system." },
+  { name: "Indiana", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, fire", agencies: "Local city/county building departments", notes: "Indianapolis has an online portal. Most of the state is decentralized with straightforward local systems." },
+  { name: "Iowa", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, zoning, fire", agencies: "Local building departments", notes: "Smaller, steady market. Des Moines and Cedar Rapids have the most permit volume. Rural counties still primarily in-person." },
+  { name: "Kansas", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning", agencies: "Local city/county building departments", notes: "Wichita and Kansas City metro are primary markets. In-person submission common outside major cities." },
+  { name: "Kentucky", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning", agencies: "Local building departments; KY DHBC for commercial", notes: "Louisville and Lexington have online portals. Eastern Kentucky coal country has unique permitting needs for energy sector." },
+  { name: "Louisiana", difficulty: "moderate", license: "No state license required for runners; contractor signature required on contractor-specific permits", permitTypes: "Building, electrical, plumbing, mechanical, fire, zoning", agencies: "Local building departments; LA LSBCE for some commercial work", notes: "New Orleans has its own unique permitting system with significant backlog. Baton Rouge and Shreveport are more accessible markets." },
+  { name: "Maine", difficulty: "easy", license: "No state license required", permitTypes: "Building, zoning, shoreland zoning, electrical, plumbing", agencies: "Local codes offices; Maine DEP for environmental", notes: "Shoreland zoning permits are unique to Maine — high demand from lakefront and coastal property owners." },
+  { name: "Maryland", difficulty: "moderate", license: "No state license required; county-level registration may be needed", permitTypes: "Building, grading, sediment control, electrical, plumbing, zoning", agencies: "County building departments (24 jurisdictions)", notes: "Maryland's permitting is entirely county-level. Montgomery County and PG County near DC are high-volume, complex markets with long review times." },
+  { name: "Massachusetts", difficulty: "moderate", license: "No state license required; contractor must sign permit application in most categories", permitTypes: "Building, electrical, plumbing, fire, zoning", agencies: "Local building departments (351 cities/towns)", notes: "Contractors must be registered with MA OCABR and sign permit applications. Runners assist with all other logistics." },
+  { name: "Michigan", difficulty: "moderate", license: "No state license required; contractor license needed for trade permits", permitTypes: "Building, electrical, mechanical, plumbing, fire", agencies: "Local building departments; Michigan BCS for statewide licensing", notes: "Detroit and Grand Rapids have online portals. Michigan has a state-level Construction Code with local enforcement." },
+  { name: "Minnesota", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning", agencies: "Local city/county building departments; MN DLI for electrical statewide", notes: "Minnesota DLI issues statewide electrical permits — unique model. Minneapolis/St. Paul area has online portals and high volume." },
+  { name: "Mississippi", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, zoning, fire", agencies: "Local building departments", notes: "Largely in-person, rural market. Jackson, Gulfport, and Biloxi are the primary urban permit markets." },
+  { name: "Missouri", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning", agencies: "Local city/county building departments", notes: "St. Louis and Kansas City are primary markets with online portals. Strong market for commercial and mixed-use development permits." },
+  { name: "Montana", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, fire, zoning", agencies: "Local building departments; MT BERD for electrical statewide", notes: "Rural and tourism-driven market. Bozeman and Missoula are fast-growing with increased permit volume. Electrical permits issued by Montana BERD statewide." },
+  { name: "Nebraska", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning", agencies: "Local city/county building departments", notes: "Omaha and Lincoln are primary markets. Stable, steady permit volume with straightforward local systems." },
+  { name: "Nevada", difficulty: "moderate", license: "No state license required; contractor signature required for contractor-specific permits", permitTypes: "Building, electrical, mechanical, plumbing, zoning, fire, sign", agencies: "Clark County (Las Vegas), Washoe County (Reno), and local cities", notes: "Las Vegas (Clark County) is one of the highest-volume permit markets in the country. Sign permits and gaming-related permits are a unique niche." },
+  { name: "New Hampshire", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning", agencies: "Local building departments (towns)", notes: "NH processes permits at the town level. Small market with 234 towns — relationship-heavy approach works well." },
+  { name: "New Jersey", difficulty: "complex", license: "No state license required but NJ has a unique UCC system with multiple subcode technical sections", permitTypes: "Building, electrical, plumbing, fire, energy subcode", agencies: "Local Construction Offices; NJ DCA Division of Codes & Standards", notes: "NJ uses the Uniform Construction Code (UCC) — permits are broken into subcodes (building, electrical, plumbing, fire). Each requires a separate subcode official review. Complex but high-volume market." },
+  { name: "New Mexico", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, mechanical, plumbing, zoning", agencies: "Local city/county building departments", notes: "Albuquerque and Santa Fe are primary markets. State-level Construction Industries Division handles some licensing." },
+  { name: "New York", difficulty: "complex", license: "NYC requires specific authorization; upstate is more accessible", permitTypes: "Building, electrical, plumbing, mechanical, zoning, fire, DOB special inspections", agencies: "NYC DOB (city); local building departments upstate", notes: "NYC is one of the most complex permit markets in the US — DOB has its own online BIS portal, PW filings, and separate processes for each borough. Upstate NY (Buffalo, Albany, Syracuse) is far more accessible." },
+  { name: "North Carolina", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning, fire", agencies: "Local county building departments", notes: "Charlotte, Raleigh-Durham, and Mecklenburg County are booming construction markets with high permit volume and online portals." },
+  { name: "North Dakota", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, fire, zoning", agencies: "Local city/county building departments", notes: "Small but stable market. Oil country in western ND (Williston Basin) has unique industrial permit needs." },
+  { name: "Ohio", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning, fire", agencies: "Local city/county building departments; Ohio ODPS for some statewide items", notes: "Columbus, Cleveland, and Cincinnati are major markets. Ohio is a strong state for permit runners with straightforward local systems and growing construction activity." },
+  { name: "Oklahoma", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning", agencies: "Local building departments; Oklahoma Construction Industries Board", notes: "Oklahoma City and Tulsa are primary markets. Energy sector (oil and gas facility permits) is a unique niche opportunity." },
+  { name: "Oregon", difficulty: "moderate", license: "No state license required; some permit types require licensed contractor signature", permitTypes: "Building, electrical, plumbing, mechanical, zoning, land use", agencies: "Local building departments; Oregon BCD handles electrical statewide", notes: "Oregon Building Codes Division issues statewide electrical permits — runner-friendly model. Portland has a complex permitting environment; Salem and Eugene are more accessible." },
+  { name: "Pennsylvania", difficulty: "moderate", license: "No state license required; UCC applies statewide with local enforcement", permitTypes: "Building, electrical, plumbing, mechanical, zoning, fire", agencies: "Local municipalities (2,500+); PA DLI for UCC oversight", notes: "PA has 2,500+ municipalities — more than any other state. This creates enormous fragmentation but also huge opportunity for runners who build portfolios of local relationships." },
+  { name: "Rhode Island", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, fire, zoning", agencies: "Local building departments; RI SBC for statewide code oversight", notes: "Smallest state — compact market. Providence is the primary permit hub. Strong relationships with a few building officials can capture most of the market." },
+  { name: "South Carolina", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, fire, zoning", agencies: "Local county building departments; SC LLR for licensing", notes: "Charleston, Columbia, and Myrtle Beach are high-growth markets. Strong residential construction boom ongoing in SC coastal counties." },
+  { name: "South Dakota", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning", agencies: "Local city/county building departments", notes: "Sioux Falls and Rapid City are primary markets. Very accessible, low-competition market for permit runners." },
+  { name: "Tennessee", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, fire, zoning", agencies: "Local building departments; TN Dept. of Commerce & Insurance for contractor licensing", notes: "Nashville and Memphis are high-growth, high-volume permit markets. Music Row and East Nashville development boom drives significant commercial permit demand." },
+  { name: "Texas", difficulty: "moderate", license: "No state license required; contractor license required for some permit types in certain cities", permitTypes: "Building, electrical, plumbing, mechanical, fire, zoning, sign", agencies: "Local city/county building departments (Texas has no statewide building code)", notes: "Texas has no mandatory statewide building code — each city adopts its own. Houston, Dallas, Austin, and San Antonio are massive markets. No zoning in Houston (unique). High opportunity state for permit runners." },
+  { name: "Utah", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning, fire", agencies: "Local city/county building departments; Utah DOPL for trade licensing", notes: "Salt Lake City and Utah County are fast-growing markets. Strong tech and commercial construction driving high permit volume." },
+  { name: "Vermont", difficulty: "easy", license: "No state license required", permitTypes: "Building, Act 250 land use, electrical, plumbing, fire, zoning", agencies: "Local building departments; VT ANR for Act 250 permits", notes: "Vermont's Act 250 land use permits are unique and complex — a specialty niche for runners serving developers. Small but stable general market." },
+  { name: "Virginia", difficulty: "moderate", license: "No state license required; USBC applies statewide", permitTypes: "Building, electrical, plumbing, mechanical, fire, zoning", agencies: "Local building departments; DHCD for USBC oversight", notes: "Northern Virginia (Fairfax, Arlington, Loudoun) near DC is an extremely high-volume, well-paying market. Richmond and Virginia Beach are also strong." },
+  { name: "Washington", difficulty: "moderate", license: "No state license required; licensed contractor signature needed for contractor permits", permitTypes: "Building, electrical, plumbing, mechanical, fire, zoning, shoreline", agencies: "Local city/county building departments; WA L&I for electrical statewide", notes: "Washington L&I issues statewide electrical permits. Seattle's DCI is high-volume and complex. Eastern WA (Spokane, Tri-Cities) is more accessible." },
+  { name: "West Virginia", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, fire, zoning", agencies: "Local building departments; WVFMO for fire", notes: "Smaller market with steady demand. Charleston and Huntington are primary hubs. Energy sector permits (coal, natural gas) present a niche opportunity." },
+  { name: "Wisconsin", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, HVAC, zoning, fire", agencies: "Local building departments; WI DSPS for statewide plumbing/electrical", notes: "Wisconsin issues statewide plumbing and electrical permits through DSPS — runner-friendly. Milwaukee and Madison are primary markets." },
+  { name: "Wyoming", difficulty: "easy", license: "No state license required", permitTypes: "Building, electrical, plumbing, mechanical, zoning, fire", agencies: "Local city/county building departments", notes: "Small market. Cheyenne and Casper are primary hubs. Energy sector (oil, gas, wind) creates unique industrial permit opportunities." }
+];
+
+function renderStates(filter = '', typeFilter = '') {
+  const grid = document.getElementById('statesGrid');
+  const filtered = statesData.filter(s => {
+    const matchName = s.name.toLowerCase().includes(filter.toLowerCase());
+    const matchType = !typeFilter || s.difficulty === typeFilter;
+    return matchName && matchType;
+  });
+  grid.innerHTML = filtered.map(s => `
+    <div class="state-card" onclick="openStateModal('${s.name}')">
+      <div class="state-card-header">
+        <div class="state-name">${s.name}</div>
+        <div class="state-badge ${s.difficulty === 'easy' ? 'badge-easy' : s.difficulty === 'moderate' ? 'badge-moderate' : 'badge-complex'}">
+          ${s.difficulty === 'easy' ? 'Easy Entry' : s.difficulty === 'moderate' ? 'Moderate' : 'Complex'}
+        </div>
+      </div>
+      <div class="state-details">
+        <div class="state-detail"><strong>License Req:</strong><span>${s.license.length > 40 ? s.license.substring(0,40)+'…' : s.license}</span></div>
+        <div class="state-detail"><strong>Permit Types:</strong><span>${s.permitTypes.length > 45 ? s.permitTypes.substring(0,45)+'…' : s.permitTypes}</span></div>
+        <div class="state-detail"><strong>Key Agency:</strong><span>${s.agencies.length > 40 ? s.agencies.substring(0,40)+'…' : s.agencies}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterStates() {
+  renderStates(document.getElementById('stateSearch').value, document.getElementById('typeFilter').value);
+}
+
+function openStateModal(stateName) {
+  const s = statesData.find(x => x.name === stateName);
+  if (!s) return;
+  document.getElementById('stateModalContent').innerHTML = `
+    <h3>📍 ${s.name}</h3>
+    <div class="tag-list" style="margin-bottom:20px">
+      <span class="tag" style="${s.difficulty==='easy'?'background:#d1fae5;color:#065f46':s.difficulty==='moderate'?'background:#fef3c7;color:#92400e':'background:#fee2e2;color:#991b1b'}">
+        ${s.difficulty==='easy'?'Easy Entry Market':s.difficulty==='moderate'?'Moderate Requirements':'Complex / Restricted'}
+      </span>
+    </div>
+    <div class="modal-section"><h4>📋 Licensing Requirements</h4><p>${s.license}</p></div>
+    <div class="modal-section"><h4>🏗️ Common Permit Types</h4><p>${s.permitTypes}</p></div>
+    <div class="modal-section"><h4>🏛️ Key Agencies</h4><p>${s.agencies}</p></div>
+    <div class="modal-section"><h4>📝 Key Notes for Permit Runners</h4><p>${s.notes}</p></div>
+  `;
+  document.getElementById('stateModal').classList.add('open');
+}
+
+function closeStateModal() { document.getElementById('stateModal').classList.remove('open'); }
+
+// MODULE TOGGLE
+function toggleModule(el) {
+  const body = el.querySelector('.module-body');
+  body.classList.toggle('open');
+  const arr = el.querySelector('.module-header span:last-child');
+  if (arr && !arr.textContent.includes('🔒')) arr.textContent = body.classList.contains('open') ? '▴' : '▾';
+}
+
+// PAYMENT
+let stripe, stripeCardElement;
+function initStripe() {
+  if (typeof Stripe === 'undefined') return;
+  stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+  const elements = stripe.elements();
+  stripeCardElement = elements.create('card', {
+    style: { base: { fontSize: '15px', color: '#1f2937', fontFamily: 'Segoe UI, system-ui, sans-serif', '::placeholder': { color: '#9ca3af' } }, invalid: { color: '#ef4444' } }
+  });
+  stripeCardElement.mount('#stripe-card-element');
+  stripeCardElement.on('change', e => { document.getElementById('stripe-card-errors').textContent = e.error ? e.error.message : ''; });
+}
+
+function showStripeForm() {
+  document.getElementById('payStep1').style.display = 'none';
+  document.getElementById('payStep2').style.display = 'block';
+  if (!stripeCardElement && typeof Stripe !== 'undefined') initStripe();
+}
+
+async function handleStripePayment() {
+  const email = document.getElementById('stripeEmail').value.trim();
+  if (!email) { alert('Please enter your email address.'); return; }
+  const btn = document.getElementById('stripe-pay-btn');
+  btn.textContent = 'Processing…'; btn.disabled = true;
+  setTimeout(() => { showEnrollSuccess(); btn.textContent = '🔒 Pay $14.99'; btn.disabled = false; }, 1800);
+}
+
+function openPayment() {
+  document.getElementById('paymentModal').classList.add('open');
+  document.getElementById('payStep1').style.display = 'block';
+  document.getElementById('payStep2').style.display = 'none';
+  document.getElementById('enrollSuccess').style.display = 'none';
+}
+function closePayment() { document.getElementById('paymentModal').classList.remove('open'); }
+function showEnrollSuccess() {
+  document.getElementById('payStep1').style.display = 'none';
+  document.getElementById('payStep2').style.display = 'none';
+  document.getElementById('enrollSuccess').style.display = 'block';
+}
+function unlockModules() {
+  document.querySelectorAll('.module.locked').forEach(m => {
+    m.classList.remove('locked');
+    const lock = m.querySelector('.module-header span:last-child');
+    if (lock) lock.textContent = '▾';
+    const num = m.querySelector('.module-num');
+    if (num) num.style.background = 'var(--primary)';
+  });
+}
+
+// INQUIRY
+function submitInquiry(e) {
+  e.preventDefault();
+  document.getElementById('inquiryForm').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+}
+
+// CHAT
+const seedMessages = [
+  { user: "Ray B.", text: "Just landed my first retainer — a roofing company in Charlotte doing 15–20 jobs a month. Took 3 months of showing up consistently. Don't give up! 🏗️", time: "8:45 AM", color: "#065f46" },
+  { user: "Tamara L.", text: "Question: in Florida, can I legally pull a roofing permit or does the contractor have to sign it?", time: "9:02 AM", color: "#b45309" },
+  { user: "Ray B.", text: "In FL the contractor has to sign as the contractor of record, but you can do everything else — prepare the package, submit it, track it, and pick up the approved permit.", time: "9:08 AM", color: "#065f46" },
+  { user: "Marcus V.", text: "Pro tip: introduce yourself to the permit office staff by name. Bring donuts once. I'm not joking — my submissions get processed faster now because they recognize me.", time: "9:22 AM", color: "#1d4ed8" },
+  { user: "Keisha M.", text: "I've been hitting Home Depot pro desks every Tuesday morning. Handed out 200 cards this month and got 8 new clients. The ROI is insane for something that costs nothing.", time: "9:35 AM", color: "#7c3aed" },
+  { user: "Coach Devon", text: "Module 7 has a full canvassing script and a retainer proposal template. Use them word for word first, then make it your own after you see what works.", time: "9:48 AM", color: "#065f46" },
+];
+
+function renderChat() {
+  const body = document.getElementById('chatBody');
+  const stored = JSON.parse(localStorage.getItem('permit_chat') || '[]');
+  const all = [...seedMessages, ...stored];
+  body.innerHTML = all.map(m => `
+    <div class="chat-msg ${m.mine ? 'mine' : ''}">
+      <div class="chat-avatar" style="background:${m.color || '#065f46'}">${(m.user||'?')[0].toUpperCase()}</div>
+      <div>
+        <div class="chat-bubble ${m.mine ? 'mine' : ''}">
+          <div class="chat-user">${m.user}</div>
+          <div class="chat-text">${m.text}</div>
+          <div class="chat-time">${m.time}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  body.scrollTop = body.scrollHeight;
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const nameInput = document.getElementById('chatName');
+  const text = input.value.trim();
+  const name = nameInput.value.trim() || 'You';
+  if (!text) return;
+  const now = new Date();
+  const time = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  const colors = ['#065f46','#1d4ed8','#7c3aed','#b45309','#be185d','#0e7490'];
+  const color = colors[Math.floor(Math.random()*colors.length)];
+  const msg = { user: name, text, time, mine: true, color };
+  const stored = JSON.parse(localStorage.getItem('permit_chat') || '[]');
+  stored.push(msg);
+  if (stored.length > 50) stored.splice(0, stored.length - 50);
+  localStorage.setItem('permit_chat', JSON.stringify(stored));
+  input.value = '';
+  renderChat();
+}
+
+function updateOnline() {
+  document.getElementById('onlineNum').textContent = 11 + Math.floor(Math.random()*6);
+}
+
+// NAV
+document.getElementById('hamburger').onclick = function() { document.getElementById('navLinks').classList.toggle('open'); };
+document.getElementById('paymentModal').onclick = function(e) { if(e.target===this) closePayment(); };
+document.getElementById('stateModal').onclick = function(e) { if(e.target===this) closeStateModal(); };
+
+// INIT
+renderStates();
+renderChat();
+setInterval(updateOnline, 9000);
+document.querySelector('.module .module-body').classList.add('open');
+</script>
+</body>
+</html>

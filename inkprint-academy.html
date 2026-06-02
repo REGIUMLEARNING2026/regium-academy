@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InkPrint Academy by Regium – Professional Fingerprinting Training</title>
+<!-- ══ STRIPE ══ Load Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+<!-- ══ PAYPAL ══ Replace YOUR_PAYPAL_CLIENT_ID with your actual Client ID. Add &enable-funding=venmo to show Venmo button -->
+<script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD&intent=capture&enable-funding=venmo" data-namespace="paypal_sdk"></script>
+<style>
+  :root {
+    --primary: #4f0080;
+    --primary-dark: #360058;
+    --accent: #a855f7;
+    --accent-light: #d8b4fe;
+    --gold: #f59e0b;
+    --white: #ffffff;
+    --gray-50: #fafafa;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --border-radius: 12px;
+    --shadow: 0 4px 24px rgba(79,0,128,0.12);
+    --shadow-lg: 0 8px 48px rgba(79,0,128,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gray-50); color: var(--gray-800); line-height: 1.6; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 1000;
+    background: var(--primary-dark);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 64px;
+  }
+  .logo { color: var(--white); font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; }
+  .logo span { color: var(--accent-light); }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-links a {
+    color: var(--gray-200); text-decoration: none; padding: 8px 12px;
+    border-radius: 8px; font-size: 0.875rem; font-weight: 500; transition: all 0.2s;
+  }
+  .nav-links a:hover { background: rgba(168,85,247,0.2); color: var(--white); }
+  .nav-cta {
+    background: var(--accent); color: var(--white) !important;
+    padding: 8px 18px !important; border-radius: 8px !important;
+  }
+  .nav-cta:hover { background: var(--primary) !important; }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 24px; height: 2px; background: white; border-radius: 2px; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, #6d28d9 100%);
+    padding: 80px 24px 100px;
+    text-align: center; color: white; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-inner { max-width: 800px; margin: 0 auto; position: relative; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(168,85,247,0.3); border: 1px solid rgba(168,85,247,0.5);
+    color: var(--accent-light); padding: 6px 16px; border-radius: 99px;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 20px; }
+  .hero h1 span { color: var(--accent-light); }
+  .hero p { font-size: 1.15rem; color: rgba(255,255,255,0.85); max-width: 600px; margin: 0 auto 36px; }
+  .hero-cta-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+  .btn-primary {
+    background: var(--gold); color: var(--gray-900); border: none;
+    padding: 14px 32px; border-radius: 10px; font-size: 1rem; font-weight: 800;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: #fbbf24; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,158,11,0.4); }
+  .btn-outline {
+    background: transparent; color: white; border: 2px solid rgba(255,255,255,0.4);
+    padding: 14px 32px; border-radius: 10px; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+  .hero-stats { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 2rem; font-weight: 900; color: var(--accent-light); }
+  .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── SECTION ── */
+  section { padding: 80px 24px; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    display: inline-block; color: var(--accent); font-size: 0.8rem;
+    font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; color: var(--gray-900); margin-bottom: 12px; }
+  .section-sub { color: var(--gray-600); font-size: 1.05rem; max-width: 600px; margin-bottom: 48px; }
+  .divider { width: 60px; height: 4px; background: var(--accent); border-radius: 2px; margin: 16px 0 32px; }
+
+  /* ── WHO NEEDS ── */
+  #who { background: white; }
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .card {
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius); padding: 24px; transition: all 0.2s;
+  }
+  .card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-3px); }
+  .card-icon { font-size: 2rem; margin-bottom: 12px; }
+  .card h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .card p { font-size: 0.875rem; color: var(--gray-600); }
+
+  /* ── COURSE ── */
+  #course { background: linear-gradient(180deg, var(--gray-50) 0%, white 100%); }
+  .price-card {
+    background: linear-gradient(135deg, var(--primary) 0%, #6d28d9 100%);
+    color: white; border-radius: 20px; padding: 36px; text-align: center;
+    max-width: 420px; margin: 0 auto 56px; box-shadow: var(--shadow-lg);
+  }
+  .price-card .price { font-size: 3.5rem; font-weight: 900; }
+  .price-card .price sup { font-size: 1.5rem; vertical-align: super; }
+  .price-card .price-label { color: rgba(255,255,255,0.7); font-size: 0.875rem; margin-top: -8px; margin-bottom: 20px; }
+  .price-features { text-align: left; margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+  .price-feature { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+  .price-feature::before { content: '✓'; color: #86efac; font-weight: 800; }
+  .price-btn {
+    width: 100%; background: var(--gold); color: var(--gray-900);
+    border: none; padding: 16px; border-radius: 10px; font-size: 1.1rem;
+    font-weight: 800; cursor: pointer; transition: all 0.2s; margin-top: 8px;
+  }
+  .price-btn:hover { background: #fbbf24; transform: scale(1.02); }
+  .modules { display: flex; flex-direction: column; gap: 16px; }
+  .module {
+    background: white; border: 1px solid var(--gray-200); border-radius: var(--border-radius);
+    overflow: hidden; transition: all 0.2s;
+  }
+  .module.locked { opacity: 0.65; }
+  .module-header {
+    display: flex; align-items: center; gap: 16px; padding: 20px 24px;
+    cursor: pointer; user-select: none;
+  }
+  .module-num {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--primary);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+  }
+  .module.locked .module-num { background: var(--gray-400); }
+  .module-title { flex: 1; font-weight: 700; color: var(--gray-900); }
+  .module-duration { font-size: 0.8rem; color: var(--gray-400); margin-right: 8px; }
+  .module-lock { color: var(--gray-400); }
+  .module-body { padding: 0 24px 20px 76px; display: none; }
+  .module-body.open { display: block; }
+  .module-body ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .module-body li { font-size: 0.9rem; color: var(--gray-600); display: flex; align-items: flex-start; gap: 8px; }
+  .module-body li::before { content: '▸'; color: var(--accent); flex-shrink: 0; }
+
+  /* ── STATES ── */
+  #states { background: white; }
+  .states-controls { display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+  .search-box {
+    flex: 1; min-width: 220px; padding: 12px 16px;
+    border: 2px solid var(--gray-200); border-radius: 10px;
+    font-size: 0.95rem; outline: none; transition: border-color 0.2s;
+  }
+  .search-box:focus { border-color: var(--accent); }
+  .filter-select {
+    padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: 10px;
+    font-size: 0.875rem; background: white; outline: none; cursor: pointer;
+  }
+  .filter-select:focus { border-color: var(--accent); }
+  .states-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+  .state-card {
+    background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--border-radius);
+    padding: 20px; transition: all 0.2s; cursor: pointer;
+  }
+  .state-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+  .state-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .state-name { font-weight: 800; color: var(--gray-900); font-size: 1.05rem; }
+  .state-badge {
+    font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 99px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .badge-ink { background: #fef3c7; color: #92400e; }
+  .badge-livescan { background: #dbeafe; color: #1e40af; }
+  .badge-both { background: #d1fae5; color: #065f46; }
+  .state-details { font-size: 0.82rem; color: var(--gray-600); display: flex; flex-direction: column; gap: 4px; }
+  .state-detail { display: flex; gap: 8px; }
+  .state-detail strong { color: var(--gray-800); min-width: 90px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 2000; align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 20px; max-width: 620px; width: 100%;
+    max-height: 80vh; overflow-y: auto; padding: 36px; position: relative;
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px; background: var(--gray-100);
+    border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer;
+    font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+  }
+  .modal h3 { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 20px; }
+  .modal-section { margin-bottom: 20px; }
+  .modal-section h4 { font-weight: 700; color: var(--gray-800); margin-bottom: 8px; font-size: 0.95rem; }
+  .modal-section p, .modal-section li { font-size: 0.9rem; color: var(--gray-600); line-height: 1.7; }
+  .modal-section ul { padding-left: 20px; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .tag {
+    background: var(--gray-100); color: var(--gray-700);
+    padding: 4px 12px; border-radius: 99px; font-size: 0.78rem; font-weight: 500;
+  }
+
+  /* ── LIVE SCAN ── */
+  #livescan { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); }
+  .livescan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .ls-card {
+    background: white; border-radius: var(--border-radius); padding: 24px;
+    border: 1px solid var(--gray-200); transition: all 0.2s;
+  }
+  .ls-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+  .ls-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+  .ls-card p { font-size: 0.82rem; color: var(--gray-600); }
+  .ls-status { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .ls-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .ls-dot.required { background: var(--success); }
+  .ls-dot.optional { background: var(--warning); }
+  .ls-dot.unavailable { background: var(--danger); }
+  .ls-status-text { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── BARRIERS ── */
+  #barriers { background: white; }
+  .barriers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .barrier-card {
+    background: var(--gray-50); border-left: 4px solid var(--danger);
+    border-radius: var(--border-radius); padding: 24px;
+  }
+  .barrier-card.warning { border-left-color: var(--warning); }
+  .barrier-card.info { border-left-color: var(--accent); }
+  .barrier-card h3 { font-weight: 700; color: var(--gray-900); margin-bottom: 8px; font-size: 1rem; }
+  .barrier-card p { font-size: 0.875rem; color: var(--gray-600); }
+
+  /* ── BUSINESS RESOURCES ── */
+  #business { background: linear-gradient(180deg, #f5f3ff 0%, white 100%); }
+  .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .resource-card {
+    background: white; border: 1px solid var(--gray-200); border-radius: var(--border-radius);
+    padding: 28px; transition: all 0.2s;
+  }
+  .resource-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-3px); }
+  .resource-icon { font-size: 2.5rem; margin-bottom: 16px; }
+  .resource-card h3 { font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .resource-card p { font-size: 0.875rem; color: var(--gray-600); }
+
+  /* ── CHAT ROOM ── */
+  #chatroom { background: var(--gray-900); color: white; }
+  #chatroom h2 { color: white; }
+  #chatroom .section-sub { color: var(--gray-400); }
+  .chat-container {
+    background: var(--gray-800); border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .chat-header {
+    background: var(--primary); padding: 16px 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .chat-dot { width: 10px; height: 10px; background: #86efac; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .chat-title { font-weight: 700; color: white; }
+  .online-count { font-size: 0.78rem; color: rgba(255,255,255,0.7); margin-left: auto; }
+  .chat-body { height: 360px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .chat-msg { display: flex; gap: 10px; }
+  .chat-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700;
+  }
+  .chat-bubble { background: rgba(255,255,255,0.07); border-radius: 12px; padding: 10px 14px; max-width: 70%; }
+  .chat-bubble.mine { background: var(--primary); margin-left: auto; }
+  .chat-user { font-size: 0.75rem; font-weight: 600; color: var(--accent-light); margin-bottom: 4px; }
+  .chat-text { font-size: 0.875rem; color: rgba(255,255,255,0.9); }
+  .chat-time { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .chat-msg.mine { flex-direction: row-reverse; }
+  .chat-msg.mine .chat-bubble { background: rgba(168,85,247,0.4); }
+  .chat-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .chat-name-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .chat-name-input {
+    flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px; padding: 10px 14px; color: white; font-size: 0.875rem; outline: none;
+  }
+  .chat-name-input::placeholder { color: rgba(255,255,255,0.3); }
+  .chat-input-row { display: flex; gap: 10px; }
+  .chat-input {
+    flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px; padding: 12px 16px; color: white; font-size: 0.9rem; outline: none;
+    transition: border-color 0.2s;
+  }
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-input::placeholder { color: rgba(255,255,255,0.3); }
+  .chat-send {
+    background: var(--accent); border: none; border-radius: 10px; padding: 12px 20px;
+    color: white; cursor: pointer; font-weight: 600; transition: all 0.2s;
+  }
+  .chat-send:hover { background: var(--primary); }
+
+  /* ── INQUIRY FORM ── */
+  #inquiry { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); color: white; }
+  #inquiry h2 { color: white; }
+  #inquiry .section-sub { color: rgba(255,255,255,0.75); }
+  #inquiry .divider { background: var(--accent-light); }
+  .inquiry-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 48px; align-items: start; }
+  .inquiry-info h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; }
+  .inquiry-info ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .inquiry-info li { display: flex; align-items: flex-start; gap: 12px; font-size: 0.9rem; color: rgba(255,255,255,0.85); }
+  .inquiry-info li::before { content: '✉'; }
+  .inquiry-form {
+    background: white; border-radius: 20px; padding: 36px; color: var(--gray-800);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 12px 14px; border: 2px solid var(--gray-200);
+    border-radius: 10px; font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group textarea { min-height: 120px; resize: vertical; }
+  .form-submit {
+    width: 100%; background: var(--primary); color: white; border: none;
+    padding: 14px; border-radius: 10px; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .form-submit:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .form-success {
+    display: none; text-align: center; padding: 24px;
+    color: var(--success); font-weight: 600; font-size: 1.1rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--gray-900); color: var(--gray-400); text-align: center;
+    padding: 48px 24px; font-size: 0.875rem;
+  }
+  footer .footer-logo { font-size: 1.3rem; font-weight: 800; color: white; margin-bottom: 8px; }
+  footer .footer-logo span { color: var(--accent-light); }
+  footer p { margin-bottom: 4px; }
+  footer .footer-links { display: flex; justify-content: center; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
+  footer .footer-links a { color: var(--gray-400); text-decoration: none; font-size: 0.8rem; }
+  footer .footer-links a:hover { color: var(--accent-light); }
+  .disclaimer {
+    max-width: 800px; margin: 16px auto 0;
+    font-size: 0.75rem; color: var(--gray-600); line-height: 1.6;
+  }
+
+  /* ── PAYMENT MODAL ── */
+  .payment-modal .modal { max-width: 480px; }
+  .payment-form .form-group { margin-bottom: 16px; }
+  .payment-form input { width: 100%; padding: 12px; border: 2px solid var(--gray-200); border-radius: 8px; font-size: 0.9rem; outline: none; }
+  .payment-form input:focus { border-color: var(--accent); }
+  .payment-note { font-size: 0.78rem; color: var(--gray-400); text-align: center; margin-top: 12px; }
+  .card-icons { display: flex; gap: 8px; margin-bottom: 16px; font-size: 1.5rem; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; }
+  .tab {
+    padding: 10px 20px; border-radius: 99px; border: 2px solid var(--gray-200);
+    background: white; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; color: var(--gray-600);
+  }
+  .tab.active { background: var(--primary); border-color: var(--primary); color: white; }
+  .tab:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .nav-links.open { display: flex; flex-direction: column; position: absolute; top: 64px; left: 0; right: 0; background: var(--primary-dark); padding: 16px; }
+    .inquiry-layout { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .hero-stats { gap: 24px; }
+    section { padding: 56px 16px; }
+  }
+
+  .enroll-success { display: none; text-align: center; padding: 32px; }
+  .enroll-success .big-check { font-size: 4rem; margin-bottom: 16px; }
+  .enroll-success h3 { color: var(--success); font-size: 1.4rem; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="regium-academy.html" class="logo">Ink<span>Print</span> Academy <small style="font-size:0.55rem;font-weight:400;opacity:0.75;letter-spacing:1px;text-transform:uppercase">by Regium</small></a>
+    <div class="nav-links" id="navLinks">
+      <a href="regium-academy.html" style="color:var(--accent-light);font-weight:600">← All Departments</a>
+      <a href="#who">Who Needs It</a>
+      <a href="#course">Course</a>
+      <a href="#states">All 50 States</a>
+      <a href="#livescan">Live Scan</a>
+      <a href="#barriers">Barriers</a>
+      <a href="#business">Start a Business</a>
+      <a href="#chatroom">Community</a>
+      <a href="#inquiry">Contact</a>
+      <a href="#course" class="nav-cta">Enroll – $19.99</a>
+    </div>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- ── DEPT TABS ── -->
+<div style="background:white;border-bottom:2px solid #f3f4f6;position:sticky;top:64px;z-index:90;">
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px;display:flex;gap:4px;overflow-x:auto;">
+    <a href="regium-academy.html" style="padding:14px 20px;font-size:0.875rem;font-weight:700;color:#4b5563;border-bottom:3px solid transparent;text-decoration:none;white-space:nowrap;transition:all 0.2s;">🏛️ All Departments</a>
+    <a href="inkprint-academy.html" style="padding:14px 20px;font-size:0.875rem;font-weight:700;color:#4f0080;border-bottom:3px solid #a855f7;text-decoration:none;white-space:nowrap;">🖐️ InkPrint Academy</a>
+    <a href="permit-runner-academy.html" style="padding:14px 20px;font-size:0.875rem;font-weight:700;color:#4b5563;border-bottom:3px solid transparent;text-decoration:none;white-space:nowrap;transition:all 0.2s;">📋 Permit Runner Academy</a>
+  </div>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🎓 Self-Paced Online Course</div>
+    <h1>Become a Certified<br><span>Fingerprint Professional</span></h1>
+    <p>Master ink fingerprinting requirements across all 50 states, build your business, and serve your community — at your own pace.</p>
+    <div class="hero-cta-group">
+      <a href="#course" class="btn-primary">🚀 Enroll Now – $19.99</a>
+      <a href="#course" class="btn-outline">View Curriculum</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">50</div><div class="stat-label">States Covered</div></div>
+      <div class="stat"><div class="stat-num">8</div><div class="stat-label">Course Modules</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Lifetime Access</div></div>
+      <div class="stat"><div class="stat-num">$19.99</div><div class="stat-label">One-Time Fee</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHO NEEDS FINGERPRINTING ── -->
+<section id="who">
+  <div class="section-inner">
+    <div class="section-label">Market Opportunity</div>
+    <h2>Who Needs Fingerprinting Services?</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Fingerprinting is required by law across dozens of industries. Your potential client base is enormous.</p>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-icon">🏫</div>
+        <h3>Teachers & School Staff</h3>
+        <p>All 50 states require fingerprint-based background checks for educators, aides, and volunteers working with children.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏥</div>
+        <h3>Healthcare Workers</h3>
+        <p>Nurses, home health aides, CNAs, and medical staff frequently require FBI or state-level fingerprint clearances.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💼</div>
+        <h3>Licensed Professionals</h3>
+        <p>Real estate agents, attorneys, insurance agents, financial advisors, and contractors often require fingerprinting for licensing.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚌</div>
+        <h3>Transportation Workers</h3>
+        <p>CDL drivers, school bus drivers, and rideshare drivers seeking TSA, DOT, or state-level clearances.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔫</div>
+        <h3>Firearms Applicants</h3>
+        <p>Concealed carry permit applicants and firearm dealers (FFL) require fingerprints in many states.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">👨‍👩‍👧</div>
+        <h3>Foster & Adoptive Parents</h3>
+        <p>All foster care and adoption proceedings require comprehensive fingerprint-based background checks.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏛️</div>
+        <h3>Government Employees</h3>
+        <p>Federal, state, and local government positions including military contractors and security clearances.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎰</div>
+        <h3>Gaming & Hospitality</h3>
+        <p>Casino workers, liquor license holders, and gaming industry employees in most states.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">✈️</div>
+        <h3>Aviation Professionals</h3>
+        <p>Pilots, flight attendants, and airport personnel require TSA-mandated fingerprint clearances.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏠</div>
+        <h3>Childcare Providers</h3>
+        <p>Daycare owners, babysitters, nannies, and childcare workers across all 50 states.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚖️</div>
+        <h3>Legal & Court System</h3>
+        <p>Bail bondsmen, private investigators, court personnel, and legal professionals.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌎</div>
+        <h3>Immigration Applicants</h3>
+        <p>USCIS requires fingerprinting for green cards, citizenship applications, and visa petitions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COURSE ── -->
+<section id="course">
+  <div class="section-inner">
+    <div class="section-label">Self-Paced Training</div>
+    <h2>Complete Fingerprinting Course</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Work through each module on your own schedule. No deadlines. Lifetime access. One low price.</p>
+
+    <div class="price-card">
+      <div class="price"><sup>$</sup>19.99</div>
+      <div class="price-label">One-time payment · Lifetime access</div>
+      <div class="price-features">
+        <div class="price-feature">All 8 course modules (self-paced)</div>
+        <div class="price-feature">All 50 state requirement guides</div>
+        <div class="price-feature">Ink fingerprinting technique videos</div>
+        <div class="price-feature">Live Scan setup guides by state</div>
+        <div class="price-feature">Business startup toolkit</div>
+        <div class="price-feature">Marketing & canvassing templates</div>
+        <div class="price-feature">Community chat room access</div>
+        <div class="price-feature">Certificate of Completion</div>
+      </div>
+      <button class="price-btn" onclick="openPayment()">🚀 Enroll Now for $19.99</button>
+    </div>
+
+    <div class="modules" id="modulesContainer">
+      <!-- Module 1 -->
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">1</div>
+          <div class="module-title">Introduction to Fingerprinting</div>
+          <span class="module-duration">~45 min</span>
+          <span>▾</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>History of fingerprinting and its legal foundation in the U.S.</li>
+            <li>Types of fingerprints: loops, whorls, and arches</li>
+            <li>The difference between ink (hard-copy) and Live Scan (digital) fingerprinting</li>
+            <li>Federal vs. state-level fingerprint requirements</li>
+            <li>Understanding FBI channelers and how they work</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 2 -->
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">2</div>
+          <div class="module-title">Ink Fingerprinting Technique</div>
+          <span class="module-duration">~90 min</span>
+          <span>▾</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Equipment needed: ink pads, FD-258 cards, rollers, and supplies</li>
+            <li>Proper hand positioning and rolling technique for clean prints</li>
+            <li>Common errors: smudging, ghosting, and incomplete prints</li>
+            <li>How to handle flat prints vs. rolled prints</li>
+            <li>Recording personal descriptor information correctly</li>
+            <li>Quality control standards the FBI requires for acceptance</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 3 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">3</div>
+          <div class="module-title">All 50 State Requirements</div>
+          <span class="module-duration">~2 hrs</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>State-by-state licensing requirements for fingerprint technicians</li>
+            <li>Which states require certification vs. no certification</li>
+            <li>FBI-approved channelers in each state</li>
+            <li>Fingerprint card formats accepted by state agencies</li>
+            <li>State agency submission procedures and timelines</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 4 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">4</div>
+          <div class="module-title">Live Scan Technology & Setup</div>
+          <span class="module-duration">~75 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>What is Live Scan and how does it differ from ink cards?</li>
+            <li>States that mandate Live Scan and states that still accept ink</li>
+            <li>Hardware options: CrossMatch, Integrated Biometrics, Suprema</li>
+            <li>Software requirements and FBI-certified system options</li>
+            <li>Becoming an authorized Live Scan operator in your state</li>
+            <li>Pricing and ROI for investing in Live Scan equipment</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 5 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">5</div>
+          <div class="module-title">Common Barriers & Disqualifiers</div>
+          <span class="module-duration">~60 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Criminal history that may prevent licensing in specific states</li>
+            <li>Physical conditions that affect fingerprint quality</li>
+            <li>How to handle worn or damaged fingerprints</li>
+            <li>Insurance and bonding requirements by state</li>
+            <li>Avoiding unauthorized practice violations</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 6 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">6</div>
+          <div class="module-title">Starting Your Fingerprinting Business</div>
+          <span class="module-duration">~90 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Business structure: LLC vs. sole proprietor</li>
+            <li>Startup costs, equipment lists, and pricing strategies</li>
+            <li>Mobile vs. brick-and-mortar fingerprinting services</li>
+            <li>Becoming an FBI-approved channeler or partnering with one</li>
+            <li>How to get on government vendor lists</li>
+            <li>Insurance, bonding, and liability protection</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 7 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">7</div>
+          <div class="module-title">Marketing & Growing Your Clientele</div>
+          <span class="module-duration">~75 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Canvassing schools, hospitals, and government offices</li>
+            <li>Building referral partnerships with HR companies and staffing agencies</li>
+            <li>Google Business Profile and local SEO for fingerprinting services</li>
+            <li>Social media strategy for your fingerprinting business</li>
+            <li>Pricing packages for high-volume corporate clients</li>
+            <li>Contracts and service agreements templates</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 8 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">8</div>
+          <div class="module-title">Certification & Final Assessment</div>
+          <span class="module-duration">~30 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Module review and knowledge check quiz</li>
+            <li>Printable InkPrint Academy Certificate of Completion</li>
+            <li>Resources for ongoing education and state updates</li>
+            <li>How to join the InkPrint Academy graduate network</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ALL 50 STATES ── -->
+<section id="states">
+  <div class="section-inner">
+    <div class="section-label">State-by-State Breakdown</div>
+    <h2>Fingerprinting Requirements — All 50 States</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Click any state card for detailed requirements, licensing info, and submission procedures.</p>
+    <div class="states-controls">
+      <input type="text" class="search-box" id="stateSearch" placeholder="🔍 Search state..." oninput="filterStates()">
+      <select class="filter-select" id="typeFilter" onchange="filterStates()">
+        <option value="">All Types</option>
+        <option value="ink">Ink Only</option>
+        <option value="livescan">Live Scan Primary</option>
+        <option value="both">Both Accepted</option>
+      </select>
+    </div>
+    <div class="states-grid" id="statesGrid"></div>
+  </div>
+</section>
+
+<!-- ── LIVE SCAN ── -->
+<section id="livescan">
+  <div class="section-inner">
+    <div class="section-label">Digital Fingerprinting</div>
+    <h2>Live Scan — State-by-State Guide</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Live Scan captures fingerprints electronically and transmits them directly to state and FBI repositories. Here's what you need to know to offer this service in your state.</p>
+
+    <div class="tabs" id="lsTabs">
+      <button class="tab active" onclick="showLsTab('required', this)">Required States</button>
+      <button class="tab" onclick="showLsTab('optional', this)">Optional States</button>
+      <button class="tab" onclick="showLsTab('setup', this)">Setup Guide</button>
+    </div>
+
+    <div id="ls-required">
+      <div class="livescan-grid" id="lsRequiredGrid"></div>
+    </div>
+    <div id="ls-optional" style="display:none">
+      <div class="livescan-grid" id="lsOptionalGrid"></div>
+    </div>
+    <div id="ls-setup" style="display:none">
+      <div class="resources-grid">
+        <div class="resource-card">
+          <div class="resource-icon">🖥️</div>
+          <h3>Step 1: Choose Your Hardware</h3>
+          <p>FBI-certified scanners include the CrossMatch GUARDIAN, Integrated Biometrics Watson Mini, and Suprema RealScan-G10. Prices range from $2,000–$8,000. Mobile USB options are available for field work.</p>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">📋</div>
+          <h3>Step 2: Software & Certification</h3>
+          <p>You need FBI-approved EBTS/F (Electronic Biometric Transmission Specification) compliant software. Many vendors bundle software with hardware. Your system must pass state ORI (Originating Agency Identifier) approval.</p>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">🏛️</div>
+          <h3>Step 3: Apply for an ORI Number</h3>
+          <p>Contact your state's Department of Justice or Criminal Justice Services to apply for an Originating Agency Identifier (ORI). This allows you to submit prints directly to the FBI CJIS Division.</p>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">🔗</div>
+          <h3>Step 4: Connect to a Channeler</h3>
+          <p>If you're not seeking your own ORI, partner with an FBI-approved channeler like Identogo, Idemia, or your state's authorized provider to route prints on your behalf.</p>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">📝</div>
+          <h3>Step 5: State Authorization</h3>
+          <p>Most states require you to register as an authorized Live Scan operator. This involves a background check, training certification, and annual renewal fees ranging from $50–$500.</p>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">💰</div>
+          <h3>Step 6: Fee Structure</h3>
+          <p>Live Scan fees include a rolling fee ($10–$25), state processing fee ($17–$75), and FBI processing fee ($13.25 for civil, $13.25 for criminal). Typical client charge: $50–$120 per session.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BARRIERS ── -->
+<section id="barriers">
+  <div class="section-inner">
+    <div class="section-label">Know Before You Start</div>
+    <h2>Issues That May Prevent You from Becoming a Fingerprint Technician</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Being aware of these barriers upfront will save you time and money during the licensing process.</p>
+    <div class="barriers-grid">
+      <div class="barrier-card">
+        <h3>🔴 Criminal Record Disqualifiers</h3>
+        <p>Felony convictions — especially for fraud, theft, or crimes against persons — will disqualify you in most states. Some states extend this to certain misdemeanors within the last 5–10 years. Always check your state's "look-back period."</p>
+      </div>
+      <div class="barrier-card">
+        <h3>🔴 Federal Disqualifiers (FBI CJIS)</h3>
+        <p>Anyone seeking to access FBI CJIS systems (required for Live Scan operators) is subject to a federal background check. Disqualifiers include: terrorism, murder, sex offenses, and drug trafficking convictions — no waiver available.</p>
+      </div>
+      <div class="barrier-card warning">
+        <h3>🟡 Lack of Business License / Insurance</h3>
+        <p>Operating without a valid business license or general liability insurance (typically $1M minimum) can result in fines or shutdown. Some states additionally require a surety bond of $10,000–$25,000.</p>
+      </div>
+      <div class="barrier-card warning">
+        <h3>🟡 Physical Conditions Affecting Fingerprint Quality</h3>
+        <p>Eczema, psoriasis, manual labor-related wear, and certain skin conditions can temporarily prevent an individual from being fingerprinted. As the technician, you must know how to document and handle "no-print" situations.</p>
+      </div>
+      <div class="barrier-card warning">
+        <h3>🟡 Unauthorized Practice</h3>
+        <p>In states that require licensure (e.g., California, Texas, Florida), operating without proper authorization is a misdemeanor or felony. Always secure required state registrations before offering services.</p>
+      </div>
+      <div class="barrier-card info">
+        <h3>🟣 Age Requirements</h3>
+        <p>Most states require applicants to be at least 18 years old to operate a fingerprinting service or access law enforcement systems. Some states set the minimum at 21 for certain licensing categories.</p>
+      </div>
+      <div class="barrier-card info">
+        <h3>🟣 Equipment Failure / Non-Certified Equipment</h3>
+        <p>Using non-FBI-certified equipment for Live Scan submissions will result in rejected prints. For ink fingerprinting, using expired or low-quality ink pads leads to FBI rejection — always use fresh, FBI-grade supplies.</p>
+      </div>
+      <div class="barrier-card info">
+        <h3>🟣 Privacy Law Compliance</h3>
+        <p>You must comply with state privacy laws governing biometric data storage and handling. States like Illinois (BIPA), Texas, and Washington have strict biometric privacy laws with substantial penalties for violations.</p>
+      </div>
+      <div class="barrier-card warning">
+        <h3>🟡 Failure to Maintain Certifications</h3>
+        <p>Some states require ongoing training and annual renewals. Letting your certification lapse while continuing to operate creates significant legal exposure. Set calendar reminders for all renewal dates.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BUSINESS RESOURCES ── -->
+<section id="business">
+  <div class="section-inner">
+    <div class="section-label">Entrepreneur Toolkit</div>
+    <h2>Start Your Fingerprinting Business</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Everything you need to launch, operate, and grow a profitable fingerprinting business from day one.</p>
+    <div class="resources-grid">
+      <div class="resource-card">
+        <div class="resource-icon">🏢</div>
+        <h3>Form Your Business Entity</h3>
+        <p>Register an LLC for liability protection. File with your Secretary of State ($50–$500). Get an EIN from the IRS (free). Open a dedicated business checking account. Estimated startup: $200–$600.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">🛠️</div>
+        <h3>Starter Equipment List</h3>
+        <p>FD-258 fingerprint cards (100-pack ~$30), Identix ink pads (~$15), fingerprint rollers, magnifying loupe, disposable gloves, cleaning wipes, and a portable table for mobile services. Total ink setup: ~$200–$400.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">🔐</div>
+        <h3>FBI Channeler Partnerships</h3>
+        <p>Partner with an FBI-approved channeler to process prints without obtaining your own ORI. Top channelers: Identogo (IDEMIA), Accurate Biometrics, and FieldPrint. Each state has designated approved providers.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">💲</div>
+        <h3>Pricing Your Services</h3>
+        <p>Standard ink fingerprinting: $25–$75/person. Live Scan (if applicable): $50–$120. Mobile/on-site corporate service: $300–$800/session. Notary + fingerprint bundled services command premium pricing.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">📣</div>
+        <h3>Marketing Channels That Work</h3>
+        <p>Google Business Profile is your #1 tool. Target schools, hospitals, staffing agencies, legal offices, and foster care agencies. Partner with HR departments for recurring contracts. Business cards in courthouses and DMV offices convert well.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">📱</div>
+        <h3>Canvassing Strategy</h3>
+        <p>Door-to-door at local businesses, nonprofits, and churches that do background checks. Attend job fairs and community events. Offer free demonstrations to HR managers. Build a referral bonus program for existing clients.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">🌐</div>
+        <h3>Online Presence Setup</h3>
+        <p>Claim your Google Business Profile immediately. Build a simple website ($0–$200/yr). List on Thumbtack, Angi, and local directories. Use "fingerprinting near me" as your primary SEO keyword.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">📃</div>
+        <h3>Government Vendor Registration</h3>
+        <p>Register on SAM.gov for federal contracts. Apply to your state's small business vendor registry. Many school districts and municipalities require vendors in their approved database — get on these lists early.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">🤝</div>
+        <h3>Strategic Partnerships</h3>
+        <p>Partner with notaries, process servers, HR consulting firms, and immigrant legal services. Offer co-branded packages. These partners become passive referral engines with minimal ongoing effort.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CHAT ROOM ── -->
+<section id="chatroom">
+  <div class="section-inner">
+    <div class="section-label">Community</div>
+    <h2>Marketing &amp; Canvassing Chat Room</h2>
+    <div class="divider" style="background: var(--accent-light);"></div>
+    <p class="section-sub">Connect with fellow fingerprint professionals. Share tips, strategies, and support.</p>
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="chat-dot"></div>
+        <div class="chat-title">InkPrint Academy Community</div>
+        <div class="online-count" id="onlineCount">🟢 <span id="onlineNum">14</span> online</div>
+      </div>
+      <div class="chat-body" id="chatBody"></div>
+      <div class="chat-footer">
+        <div class="chat-name-row">
+          <input type="text" class="chat-name-input" id="chatName" placeholder="Your name or nickname" maxlength="30">
+        </div>
+        <div class="chat-input-row">
+          <input type="text" class="chat-input" id="chatInput" placeholder="Share a tip, ask a question..." maxlength="300" onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">Send ➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INQUIRY FORM ── -->
+<section id="inquiry">
+  <div class="section-inner">
+    <div class="section-label">Get Answers</div>
+    <h2>Submit an Inquiry</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Have a specific question about fingerprinting requirements in your state? Ask our team.</p>
+    <div class="inquiry-layout">
+      <div class="inquiry-info">
+        <h3>We're here to help</h3>
+        <ul>
+          <li>Questions about state-specific licensing requirements</li>
+          <li>Help choosing between ink fingerprinting and Live Scan</li>
+          <li>Guidance on starting or expanding your fingerprinting business</li>
+          <li>Technical questions about equipment and submissions</li>
+          <li>General course questions and enrollment support</li>
+        </ul>
+      </div>
+      <div class="inquiry-form" id="inquiryFormContainer">
+        <form id="inquiryForm" onsubmit="submitInquiry(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name *</label>
+              <input type="text" required placeholder="Jane">
+            </div>
+            <div class="form-group">
+              <label>Last Name *</label>
+              <input type="text" required placeholder="Smith">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" required placeholder="jane@example.com">
+          </div>
+          <div class="form-group">
+            <label>Your State</label>
+            <select id="inquiryState">
+              <option value="">Select your state...</option>
+              <option>Alabama</option><option>Alaska</option><option>Arizona</option>
+              <option>Arkansas</option><option>California</option><option>Colorado</option>
+              <option>Connecticut</option><option>Delaware</option><option>Florida</option>
+              <option>Georgia</option><option>Hawaii</option><option>Idaho</option>
+              <option>Illinois</option><option>Indiana</option><option>Iowa</option>
+              <option>Kansas</option><option>Kentucky</option><option>Louisiana</option>
+              <option>Maine</option><option>Maryland</option><option>Massachusetts</option>
+              <option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
+              <option>Missouri</option><option>Montana</option><option>Nebraska</option>
+              <option>Nevada</option><option>New Hampshire</option><option>New Jersey</option>
+              <option>New Mexico</option><option>New York</option><option>North Carolina</option>
+              <option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
+              <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option>
+              <option>South Carolina</option><option>South Dakota</option><option>Tennessee</option>
+              <option>Texas</option><option>Utah</option><option>Vermont</option>
+              <option>Virginia</option><option>Washington</option><option>West Virginia</option>
+              <option>Wisconsin</option><option>Wyoming</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Topic</label>
+            <select>
+              <option>State Licensing Requirements</option>
+              <option>Live Scan Setup</option>
+              <option>Starting a Business</option>
+              <option>Course Question</option>
+              <option>Equipment Help</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Your Question *</label>
+            <textarea required placeholder="Describe your question in detail..."></textarea>
+          </div>
+          <button type="submit" class="form-submit">📨 Submit Inquiry</button>
+        </form>
+        <div class="form-success" id="formSuccess">
+          <div style="font-size:3rem;margin-bottom:12px">✅</div>
+          <div>Thank you! Your inquiry has been received. We'll respond within 1–2 business days.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">Ink<span>Print</span> Academy <small style="font-size:0.6rem;font-weight:400;opacity:0.6;letter-spacing:1px;text-transform:uppercase">by Regium</small></div>
+  <p>A Department of <a href="regium-academy.html" style="color:var(--accent-light);text-decoration:none;font-weight:600">Regium Academy</a> · Professional Fingerprinting Training for All 50 States</p>
+  <div class="footer-links">
+    <a href="regium-academy.html">← Regium Academy Home</a>
+    <a href="permit-runner-academy.html">Permit Runner Dept.</a>
+    <a href="#who">Who Needs It</a>
+    <a href="#course">Course</a>
+    <a href="#states">All 50 States</a>
+    <a href="#livescan">Live Scan</a>
+    <a href="#barriers">Barriers</a>
+    <a href="#business">Start a Business</a>
+    <a href="#chatroom">Community</a>
+    <a href="#inquiry">Contact</a>
+  </div>
+  <p class="disclaimer">
+    InkPrint Academy provides educational content for informational purposes. State licensing requirements change frequently.
+    Always verify current requirements with your state's official licensing agency before operating.
+    InkPrint Academy is not a government agency and is not affiliated with the FBI, DOJ, or any state government body.
+    © 2025 InkPrint Academy. All rights reserved.
+  </p>
+</footer>
+
+<!-- ── PAYMENT MODAL ── -->
+<div class="modal-overlay payment-modal" id="paymentModal">
+  <div class="modal" style="max-width:500px">
+    <button class="modal-close" onclick="closePayment()">✕</button>
+
+    <!-- Step 1: Choose method -->
+    <div id="payStep1">
+      <h3 style="font-size:1.3rem;font-weight:800;color:var(--primary);margin-bottom:6px">🎓 Enroll in InkPrint Academy</h3>
+      <p style="font-size:0.875rem;color:#6b7280;margin-bottom:24px">One-time payment of <strong style="color:var(--gray-900)">$19.99</strong> · Lifetime access · No subscription</p>
+
+      <!-- Stripe card button -->
+      <button onclick="showStripeForm()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:#635bff;color:white;border:none;padding:15px;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:12px;transition:opacity 0.2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        Pay with Card (Stripe)
+      </button>
+
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
+        <div style="flex:1;height:1px;background:#e5e7eb"></div>
+        <span style="font-size:0.8rem;color:#9ca3af;font-weight:500">or pay with</span>
+        <div style="flex:1;height:1px;background:#e5e7eb"></div>
+      </div>
+
+      <!-- PayPal + Venmo buttons rendered by SDK -->
+      <div id="paypal-button-container"></div>
+      <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin-top:14px">🔒 All payments are secure & encrypted · 30-day money-back guarantee</p>
+    </div>
+
+    <!-- Step 2: Stripe card form -->
+    <div id="payStep2" style="display:none">
+      <button onclick="document.getElementById('payStep2').style.display='none';document.getElementById('payStep1').style.display='block'" style="background:none;border:none;color:var(--accent);font-size:0.85rem;font-weight:600;cursor:pointer;margin-bottom:16px;padding:0">← Back</button>
+      <h3 style="font-size:1.2rem;font-weight:800;color:var(--primary);margin-bottom:4px">Pay with Card</h3>
+      <p style="font-size:0.875rem;color:#6b7280;margin-bottom:20px">Secure payment via <strong>Stripe</strong> · $19.99</p>
+
+      <div style="margin-bottom:16px">
+        <label style="font-size:0.82rem;font-weight:600;color:#374151;display:block;margin-bottom:6px">Email</label>
+        <input type="email" id="stripeEmail" placeholder="you@example.com" style="width:100%;padding:11px 13px;border:2px solid #e5e7eb;border-radius:9px;font-size:0.9rem;outline:none;transition:border-color 0.2s" onfocus="this.style.borderColor='#a855f7'" onblur="this.style.borderColor='#e5e7eb'">
+      </div>
+
+      <!-- Stripe Elements mounts here -->
+      <div style="margin-bottom:16px">
+        <label style="font-size:0.82rem;font-weight:600;color:#374151;display:block;margin-bottom:6px">Card Details</label>
+        <div id="stripe-card-element" style="padding:12px 13px;border:2px solid #e5e7eb;border-radius:9px;background:white;min-height:42px"></div>
+        <div id="stripe-card-errors" style="color:#ef4444;font-size:0.8rem;margin-top:6px"></div>
+      </div>
+
+      <button id="stripe-pay-btn" onclick="handleStripePayment()" style="width:100%;background:#635bff;color:white;border:none;padding:14px;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity 0.2s">
+        🔒 Pay $19.99
+      </button>
+      <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin-top:10px">Powered by Stripe · Your card info is never stored on our servers</p>
+    </div>
+
+    <!-- Success state -->
+    <div class="enroll-success" id="enrollSuccess">
+      <div class="big-check">🎉</div>
+      <h3>You're enrolled!</h3>
+      <p style="color:#4b5563;margin-bottom:16px">Welcome to InkPrint Academy by Regium. All modules are now unlocked. Check your email for access details.</p>
+      <button onclick="unlockModules(); closePayment();" style="background:var(--primary);color:white;border:none;padding:12px 28px;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer">
+        Start Learning →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── STATE DETAIL MODAL ── -->
+<div class="modal-overlay" id="stateModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeStateModal()">✕</button>
+    <div id="stateModalContent"></div>
+  </div>
+</div>
+
+<script>
+// ── STATE DATA ──
+const statesData = [
+  { name: "Alabama", type: "both", license: "No state license required", channeler: "Cogent Systems / Identogo", fee: "$26.25 state + $13.25 FBI", notes: "Use FD-258 cards. Submit to ALEA. Live Scan available via Identogo locations.", agencies: ["ALEA – Alabama Law Enforcement Agency"], common: ["Education", "Healthcare", "Firearms"] },
+  { name: "Alaska", type: "both", license: "No state license required", channeler: "Alaska DPS or FBI channeler", fee: "$20 state + $13.25 FBI", notes: "Ink FD-258 cards widely accepted. Live Scan available in Anchorage and Fairbanks.", agencies: ["Alaska DPS CJIS"], common: ["Education", "Childcare", "Government"] },
+  { name: "Arizona", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$22 state + $13.25 FBI", notes: "DPS accepts ink and Live Scan. Fingerprinting technicians need no specific state license.", agencies: ["Arizona DPS"], common: ["Education", "Real Estate", "Gaming"] },
+  { name: "Arkansas", type: "both", license: "No state license required", channeler: "Identogo", fee: "$25 state + $13.25 FBI", notes: "Arkansas State Police manages AFIS. FD-258 cards accepted. Live Scan via Identogo.", agencies: ["Arkansas State Police CJIS"], common: ["Education", "Healthcare", "Childcare"] },
+  { name: "California", type: "livescan", license: "DOJ Rolling Program registration required", channeler: "CA DOJ – must be state authorized", fee: "$32 state + $13.25 FBI", notes: "California is primarily Live Scan. Ink cards accepted for out-of-state applicants only. Operators must register with CA DOJ.", agencies: ["CA DOJ Bureau of Criminal Information"], common: ["Education", "Healthcare", "Real Estate", "Gaming", "Childcare"] },
+  { name: "Colorado", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$28.25 state + $13.25 FBI", notes: "CDPS accepts both formats. Ink FD-258 and Live Scan. CBI manages the system.", agencies: ["Colorado Bureau of Investigation (CBI)"], common: ["Education", "Cannabis Industry", "Healthcare"] },
+  { name: "Connecticut", type: "both", license: "No state license required", channeler: "Identogo", fee: "$75 state + $13.25 FBI", notes: "DESPP manages fingerprint submissions. Both ink and electronic accepted.", agencies: ["CT DESPP – State Police"], common: ["Education", "Legal", "Financial Services"] },
+  { name: "Delaware", type: "both", license: "No state license required", channeler: "Identogo", fee: "$65 state + $13.25 FBI", notes: "DSP and SBI coordinate fingerprint processing. FD-258 accepted statewide.", agencies: ["Delaware State Bureau of Identification (SBI)"], common: ["Education", "Healthcare", "Government"] },
+  { name: "Florida", type: "both", license: "FDLE authorized vendor registration recommended", channeler: "Identogo / FieldPrint / Live Scan FL", fee: "$24 state + $13.25 FBI", notes: "Florida uses both. FDLE manages the statewide system. Operators should register as an authorized Live Scan vendor for businesses.", agencies: ["FDLE – Florida Department of Law Enforcement"], common: ["Education", "Real Estate", "Healthcare", "Childcare", "Firearms"] },
+  { name: "Georgia", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$26 state + $13.25 FBI", notes: "GCIC manages fingerprint records. Both FD-258 and Live Scan accepted.", agencies: ["GCIC – GA Crime Information Center"], common: ["Education", "Healthcare", "Law Enforcement Civilian"] },
+  { name: "Hawaii", type: "both", license: "No state license required", channeler: "Hawaii Criminal Justice Data Center", fee: "$15 state + $13.25 FBI", notes: "HCJDC manages submissions. Ink cards widely used due to island logistics.", agencies: ["Hawaii CJDC"], common: ["Education", "Government", "Healthcare"] },
+  { name: "Idaho", type: "both", license: "No state license required", channeler: "Identogo", fee: "$20 state + $13.25 FBI", notes: "ISP manages AFIS. Both ink and electronic accepted.", agencies: ["Idaho State Police CJIS"], common: ["Education", "Healthcare", "Agriculture Workers"] },
+  { name: "Illinois", type: "both", license: "No state license required (BIPA compliance required)", channeler: "Identogo / FieldPrint", fee: "$30 state + $13.25 FBI", notes: "BIOMETRIC PRIVACY: Illinois BIPA law applies — strict rules on biometric data collection and storage. ISP manages submissions.", agencies: ["Illinois State Police (ISP)"], common: ["Education", "Gaming", "Healthcare", "Real Estate"] },
+  { name: "Indiana", type: "both", license: "No state license required", channeler: "Identogo", fee: "$16.32 state + $13.25 FBI", notes: "ISP Criminal History Section manages fingerprints. Both formats accepted.", agencies: ["Indiana State Police"], common: ["Education", "Healthcare", "Firearms"] },
+  { name: "Iowa", type: "both", license: "No state license required", channeler: "Identogo", fee: "$30 state + $13.25 FBI", notes: "DCI handles submissions. Ink FD-258 widely accepted. Live Scan available in major cities.", agencies: ["Iowa DCI (Division of Criminal Investigation)"], common: ["Education", "Childcare", "Healthcare"] },
+  { name: "Kansas", type: "both", license: "No state license required", channeler: "Identogo", fee: "$20 state + $13.25 FBI", notes: "KBI manages the fingerprint database. Both methods accepted.", agencies: ["KBI – Kansas Bureau of Investigation"], common: ["Education", "Healthcare", "Law"] },
+  { name: "Kentucky", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$20 state + $13.25 FBI", notes: "KSP manages AFIS. FD-258 and electronic both accepted.", agencies: ["Kentucky State Police"], common: ["Education", "Healthcare", "Banking"] },
+  { name: "Louisiana", type: "both", license: "No state license required", channeler: "Identogo", fee: "$26 state + $13.25 FBI", notes: "LSP handles criminal records. Both formats accepted. Some agencies use their own Live Scan vendors.", agencies: ["Louisiana State Police CJIS"], common: ["Education", "Gaming", "Healthcare", "Oil & Gas"] },
+  { name: "Maine", type: "both", license: "No state license required", channeler: "Identogo", fee: "$31 state + $13.25 FBI", notes: "Maine SBI manages fingerprints. Both ink and electronic accepted.", agencies: ["Maine SBI – State Bureau of Identification"], common: ["Education", "Healthcare", "Childcare"] },
+  { name: "Maryland", type: "livescan", license: "CHRI operator authorization required", channeler: "MD CJIS – must be state authorized", fee: "$18 state + $13.25 FBI", notes: "Maryland is predominantly Live Scan. CHRI operators must be authorized by MD CJIS. Ink cards only for specific federal submissions.", agencies: ["Maryland CJIS Central Repository"], common: ["Education", "Healthcare", "Government Contractors"] },
+  { name: "Massachusetts", type: "both", license: "No state license required", channeler: "Identogo", fee: "$30 state + $13.25 FBI", notes: "DCJIS manages submissions. Both accepted. CORI checks often paired with fingerprinting.", agencies: ["MA DCJIS – Dept. of Criminal Justice Information Services"], common: ["Education", "Healthcare", "Firearms", "Financial"] },
+  { name: "Michigan", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$30 state + $13.25 FBI", notes: "MSP CJIS manages records. Both accepted. Live Scan increasingly preferred.", agencies: ["Michigan State Police CJIS"], common: ["Education", "Healthcare", "Auto Industry"] },
+  { name: "Minnesota", type: "both", license: "No state license required", channeler: "Identogo", fee: "$15 state + $13.25 FBI", notes: "BCA manages the state fingerprint system. Both methods accepted.", agencies: ["MN BCA – Bureau of Criminal Apprehension"], common: ["Education", "Healthcare", "Childcare"] },
+  { name: "Mississippi", type: "both", license: "No state license required", channeler: "Identogo", fee: "$26 state + $13.25 FBI", notes: "MDPS manages submissions. FD-258 most common. Live Scan available in Jackson and Biloxi.", agencies: ["Mississippi Department of Public Safety"], common: ["Education", "Healthcare", "Government"] },
+  { name: "Missouri", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$28.25 state + $13.25 FBI", notes: "MSHP CJIS Division manages records. Both formats accepted.", agencies: ["Missouri State Highway Patrol CJIS"], common: ["Education", "Healthcare", "Legal"] },
+  { name: "Montana", type: "both", license: "No state license required", channeler: "Identogo", fee: "$18 state + $13.25 FBI", notes: "DCI manages submissions. Ink cards common due to rural geography.", agencies: ["Montana DOJ DCI"], common: ["Education", "Mining Industry", "Government"] },
+  { name: "Nebraska", type: "both", license: "No state license required", channeler: "Identogo", fee: "$25 state + $13.25 FBI", notes: "NSDC manages fingerprint system. Both formats accepted.", agencies: ["Nebraska State Patrol CJIS"], common: ["Education", "Healthcare", "Agriculture"] },
+  { name: "Nevada", type: "both", license: "No state license required", channeler: "Identogo / Nevada DPS vendors", fee: "$27 state + $13.25 FBI", notes: "NCJIS manages submissions. Gaming industry a major driver of fingerprinting demand.", agencies: ["Nevada DPS – Records & Technology Division"], common: ["Gaming", "Education", "Healthcare", "Cannabis"] },
+  { name: "New Hampshire", type: "both", license: "No state license required", channeler: "Identogo", fee: "$25 state + $13.25 FBI", notes: "NHSP manages records. Both accepted. Small market but steady demand.", agencies: ["NH State Police — Criminal Records Unit"], common: ["Education", "Healthcare", "Government"] },
+  { name: "New Jersey", type: "livescan", license: "NJSP vendor authorization required", channeler: "Identogo (state primary vendor)", fee: "$30.50 state + $13.25 FBI", notes: "NJ is primarily Live Scan. NJSP manages the SBI. Ink cards for federal-only submissions. Vendors must be NJSP authorized.", agencies: ["NJSP SBI – State Bureau of Identification"], common: ["Education", "Financial Services", "Healthcare", "Real Estate"] },
+  { name: "New Mexico", type: "both", license: "No state license required", channeler: "Identogo", fee: "$17 state + $13.25 FBI", notes: "NMDPS manages records. Both methods accepted.", agencies: ["NM Department of Public Safety"], common: ["Education", "Healthcare", "Government"] },
+  { name: "New York", type: "both", license: "No state license required", channeler: "Identogo / OCA Live Scan (for courts)", fee: "$75 state + $13.25 FBI", notes: "DCJS manages records. NY has specific requirements by agency. OCA Live Scan for court-related prints.", agencies: ["NY DCJS – Division of Criminal Justice Services"], common: ["Education", "Financial", "Healthcare", "Real Estate", "Gaming"] },
+  { name: "North Carolina", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$14 state + $13.25 FBI", notes: "CCBI manages submissions. Both formats accepted. Affordable state fees.", agencies: ["NC SBI – State Bureau of Investigation"], common: ["Education", "Healthcare", "Manufacturing"] },
+  { name: "North Dakota", type: "both", license: "No state license required", channeler: "Identogo", fee: "$30 state + $13.25 FBI", notes: "NDSBI manages records. Both methods accepted.", agencies: ["ND SBI – State Bureau of Investigation"], common: ["Education", "Oil Industry", "Agriculture"] },
+  { name: "Ohio", type: "both", license: "No state license required", channeler: "Identogo / WebCheck (state system)", fee: "$22 state + $13.25 FBI", notes: "BCI manages records. Ohio uses WebCheck for many state fingerprint submissions. Both ink and Live Scan accepted.", agencies: ["Ohio BCI – Bureau of Criminal Investigation"], common: ["Education", "Healthcare", "Manufacturing"] },
+  { name: "Oklahoma", type: "both", license: "No state license required", channeler: "Identogo", fee: "$15 state + $13.25 FBI", notes: "OSBI manages submissions. Both methods accepted.", agencies: ["OSBI – Oklahoma State Bureau of Investigation"], common: ["Education", "Healthcare", "Energy Industry"] },
+  { name: "Oregon", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$62 state + $13.25 FBI", notes: "OSP manages records. Both accepted. Higher state processing fee than most.", agencies: ["Oregon State Police CJIS"], common: ["Education", "Cannabis", "Healthcare"] },
+  { name: "Pennsylvania", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$22 state + $13.25 FBI", notes: "PSP manages AFIS. Both formats accepted. Ink common for education sector (Act 34).", agencies: ["PA State Police Central Repository"], common: ["Education", "Healthcare", "Financial"] },
+  { name: "Rhode Island", type: "both", license: "No state license required", channeler: "Identogo", fee: "$30 state + $13.25 FBI", notes: "RISP manages records. Both methods accepted. Smallest state — highly concentrated market.", agencies: ["Rhode Island State Police — BCI"], common: ["Education", "Healthcare", "Government"] },
+  { name: "South Carolina", type: "both", license: "No state license required", channeler: "Identogo / SLED approved vendors", fee: "$25 state + $13.25 FBI", notes: "SLED manages state fingerprint records. Both methods accepted.", agencies: ["SLED – SC Law Enforcement Division"], common: ["Education", "Healthcare", "Manufacturing"] },
+  { name: "South Dakota", type: "both", license: "No state license required", channeler: "Identogo", fee: "$43.25 state + $13.25 FBI", notes: "SDCI manages submissions. Both methods accepted.", agencies: ["SD DCI – Division of Criminal Investigation"], common: ["Education", "Agriculture", "Government"] },
+  { name: "Tennessee", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$29.25 state + $13.25 FBI", notes: "TBI manages records. Both formats accepted. Growing market due to population growth.", agencies: ["TBI – Tennessee Bureau of Investigation"], common: ["Education", "Healthcare", "Manufacturing"] },
+  { name: "Texas", type: "both", license: "DPS Private Security Bureau registration recommended", channeler: "Identogo / FieldPrint", fee: "$10 state + $13.25 FBI", notes: "DPS manages records. Both methods accepted. Private fingerprinting businesses may need Private Investigator or Security Consultant registration.", agencies: ["Texas DPS – CJIS"], common: ["Education", "Healthcare", "Oil & Gas", "Real Estate"] },
+  { name: "Utah", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$15 state + $13.25 FBI", notes: "BCI manages submissions. Both formats accepted.", agencies: ["Utah BCI – Bureau of Criminal Identification"], common: ["Education", "Healthcare", "Technology"] },
+  { name: "Vermont", type: "both", license: "No state license required", channeler: "Identogo", fee: "$30 state + $13.25 FBI", notes: "VSP manages records. Both methods accepted. Small but stable market.", agencies: ["Vermont State Police — Criminal Justice Services"], common: ["Education", "Healthcare", "Government"] },
+  { name: "Virginia", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$18 state + $13.25 FBI", notes: "VCIN manages records. Both formats accepted. Large government contractor market near DC.", agencies: ["VCIN – Virginia Criminal Information Network"], common: ["Education", "Government Contractors", "Healthcare"] },
+  { name: "Washington", type: "livescan", license: "WSP authorized operator required", channeler: "Identogo (primary) / WSP authorized vendors", fee: "$30 state + $13.25 FBI", notes: "WA is primarily Live Scan. WSP manages WATCH system. BIOMETRIC PRIVACY: WA has biometric data privacy laws similar to BIPA.", agencies: ["WSP – Washington State Patrol CJIS"], common: ["Education", "Cannabis", "Technology", "Healthcare"] },
+  { name: "West Virginia", type: "both", license: "No state license required", channeler: "Identogo", fee: "$22 state + $13.25 FBI", notes: "WVSP manages records. Both methods accepted.", agencies: ["WV State Police CJIS"], common: ["Education", "Healthcare", "Mining"] },
+  { name: "Wisconsin", type: "both", license: "No state license required", channeler: "Identogo / FieldPrint", fee: "$13 state + $13.25 FBI", notes: "WI DOJ manages records. Both methods accepted. Very affordable state fees.", agencies: ["WI DOJ – Crime Information Bureau"], common: ["Education", "Healthcare", "Manufacturing"] },
+  { name: "Wyoming", type: "both", license: "No state license required", channeler: "Identogo", fee: "$15 state + $13.25 FBI", notes: "DCI manages submissions. Both methods accepted.", agencies: ["WY DCI – Division of Criminal Investigation"], common: ["Education", "Energy Industry", "Government"] }
+];
+
+// ── LIVE SCAN DATA ──
+const lsRequiredStates = [
+  { name: "California", status: "required", note: "DOJ Rolling Program — all civilian background checks must use Live Scan via authorized operators." },
+  { name: "Maryland", status: "required", note: "CHRI system is electronic-only. Ink cards not accepted for state-level submissions." },
+  { name: "New Jersey", status: "required", note: "NJSP SBI requires electronic submissions through authorized Identogo vendor sites." },
+  { name: "Washington", status: "required", note: "WSP WATCH system — primarily Live Scan for employment and licensing checks." },
+  { name: "New York (State agencies)", status: "required", note: "DCJS mandates Live Scan for most state agency employment fingerprinting." },
+  { name: "Florida (FDLE system)", status: "required", note: "FDLE Livescan Network — preferred method for most employer-initiated checks." },
+];
+
+const lsOptionalStates = [
+  { name: "Texas", status: "optional", note: "DPS accepts both. Live Scan available via Identogo and FieldPrint statewide." },
+  { name: "Ohio", status: "optional", note: "WebCheck system preferred. Ink (FD-258) still accepted for many agencies." },
+  { name: "Illinois", status: "optional", note: "ISP accepts both. Live Scan growing, especially in Cook County." },
+  { name: "Pennsylvania", status: "optional", note: "PSP accepts both. Ink common for education sector background checks." },
+  { name: "Georgia", status: "optional", note: "GCIC accepts both. Live Scan growing in metro Atlanta area." },
+  { name: "Colorado", status: "optional", note: "CBI accepts both. Live Scan preferred for expedited results." },
+  { name: "Arizona", status: "optional", note: "DPS accepts both formats via multiple channelers." },
+  { name: "Nevada", status: "optional", note: "NCJIS accepts both. Gaming Board requires Live Scan." },
+  { name: "Tennessee", status: "optional", note: "TBI accepts both. Live Scan available via FieldPrint and Identogo." },
+  { name: "Virginia", status: "optional", note: "VCIN accepts both. Electronic growing in Northern Virginia/DC market." },
+  { name: "Michigan", status: "optional", note: "MSP accepts both. Live Scan increasingly required by major employers." },
+  { name: "Minnesota", status: "optional", note: "BCA accepts both formats. Either method results in same turnaround." },
+];
+
+// ── RENDER STATES ──
+function renderStates(filter = '', typeFilter = '') {
+  const grid = document.getElementById('statesGrid');
+  const filtered = statesData.filter(s => {
+    const matchName = s.name.toLowerCase().includes(filter.toLowerCase());
+    const matchType = !typeFilter || s.type === typeFilter;
+    return matchName && matchType;
+  });
+  grid.innerHTML = filtered.map(s => `
+    <div class="state-card" onclick="openStateModal('${s.name}')">
+      <div class="state-card-header">
+        <div class="state-name">${s.name}</div>
+        <div class="state-badge ${s.type === 'ink' ? 'badge-ink' : s.type === 'livescan' ? 'badge-livescan' : 'badge-both'}">
+          ${s.type === 'ink' ? 'Ink Only' : s.type === 'livescan' ? 'Live Scan Primary' : 'Both Accepted'}
+        </div>
+      </div>
+      <div class="state-details">
+        <div class="state-detail"><strong>License:</strong><span>${s.license}</span></div>
+        <div class="state-detail"><strong>Channeler:</strong><span>${s.channeler}</span></div>
+        <div class="state-detail"><strong>Fees:</strong><span>${s.fee}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterStates() {
+  renderStates(
+    document.getElementById('stateSearch').value,
+    document.getElementById('typeFilter').value
+  );
+}
+
+function openStateModal(stateName) {
+  const s = statesData.find(x => x.name === stateName);
+  if (!s) return;
+  const content = document.getElementById('stateModalContent');
+  content.innerHTML = `
+    <h3>📍 ${s.name}</h3>
+    <div class="tag-list" style="margin-bottom:20px">
+      <span class="tag" style="background:#f3e8ff;color:#6b21a8">${s.type === 'both' ? 'Ink & Live Scan Accepted' : s.type === 'livescan' ? 'Live Scan Primary' : 'Ink Fingerprinting'}</span>
+    </div>
+    <div class="modal-section">
+      <h4>📋 Licensing Requirements</h4>
+      <p>${s.license}</p>
+    </div>
+    <div class="modal-section">
+      <h4>💰 Processing Fees</h4>
+      <p>${s.fee}</p>
+    </div>
+    <div class="modal-section">
+      <h4>🔗 Approved Channeler(s)</h4>
+      <p>${s.channeler}</p>
+    </div>
+    <div class="modal-section">
+      <h4>🏛️ Governing Agency</h4>
+      <ul>${s.agencies.map(a => `<li>${a}</li>`).join('')}</ul>
+    </div>
+    <div class="modal-section">
+      <h4>📝 Key Notes</h4>
+      <p>${s.notes}</p>
+    </div>
+    <div class="modal-section">
+      <h4>👥 Common Client Industries</h4>
+      <div class="tag-list">${s.common.map(c => `<span class="tag">${c}</span>`).join('')}</div>
+    </div>
+  `;
+  document.getElementById('stateModal').classList.add('open');
+}
+
+function closeStateModal() { document.getElementById('stateModal').classList.remove('open'); }
+
+// ── RENDER LIVE SCAN ──
+function renderLiveScan() {
+  document.getElementById('lsRequiredGrid').innerHTML = lsRequiredStates.map(s => `
+    <div class="ls-card">
+      <div class="ls-status">
+        <div class="ls-dot required"></div>
+        <div class="ls-status-text" style="color:#10b981">Required</div>
+      </div>
+      <h3>${s.name}</h3>
+      <p>${s.note}</p>
+    </div>
+  `).join('');
+
+  document.getElementById('lsOptionalGrid').innerHTML = lsOptionalStates.map(s => `
+    <div class="ls-card">
+      <div class="ls-status">
+        <div class="ls-dot optional"></div>
+        <div class="ls-status-text" style="color:#f59e0b">Optional / Both Accepted</div>
+      </div>
+      <h3>${s.name}</h3>
+      <p>${s.note}</p>
+    </div>
+  `).join('');
+}
+
+function showLsTab(tab, el) {
+  ['required','optional','setup'].forEach(t => {
+    document.getElementById('ls-'+t).style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('#lsTabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── MODULE TOGGLE ──
+function toggleModule(el) {
+  const body = el.querySelector('.module-body');
+  body.classList.toggle('open');
+  const arr = el.querySelector('.module-header span:last-child');
+  if (arr && !arr.textContent.includes('🔒')) arr.textContent = body.classList.contains('open') ? '▴' : '▾';
+}
+
+// ══════════════════════════════════════════════
+// PAYMENT CONFIGURATION — SWAP IN YOUR KEYS HERE
+// ══════════════════════════════════════════════
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51TdwFdH90tmu5OvoUIuCK6LFKaJ2Qj8O8YR8Au3ORLVli7Nnp6QqH4QUxycKnmqPcKhKnjnkqWTiGfh0kq5X3sug00LY6ED0kT';
+// After creating your $19.99 product in Stripe Dashboard → Catalog → Products,
+// paste the Price ID below (starts with price_...):
+const STRIPE_PRICE_ID = 'price_1TdwSRH90tmu5OvoEzjhzkmA';
+
+// PayPal: replace YOUR_PAYPAL_CLIENT_ID in the <script> tag in the <head> above.
+// ══════════════════════════════════════════════
+
+// ── STRIPE SETUP ──
+let stripe, stripeCardElement;
+
+function initStripe() {
+  if (typeof Stripe === 'undefined') return;
+  stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+  const elements = stripe.elements();
+  stripeCardElement = elements.create('card', {
+    style: {
+      base: { fontSize: '15px', color: '#1f2937', fontFamily: 'Segoe UI, system-ui, sans-serif', '::placeholder': { color: '#9ca3af' } },
+      invalid: { color: '#ef4444' }
+    }
+  });
+  stripeCardElement.mount('#stripe-card-element');
+  stripeCardElement.on('change', e => {
+    document.getElementById('stripe-card-errors').textContent = e.error ? e.error.message : '';
+  });
+}
+
+function showStripeForm() {
+  document.getElementById('payStep1').style.display = 'none';
+  document.getElementById('payStep2').style.display = 'block';
+  // Mount card element on first open
+  if (!stripeCardElement && typeof Stripe !== 'undefined') initStripe();
+}
+
+async function handleStripePayment() {
+  const email = document.getElementById('stripeEmail').value.trim();
+  if (!email) { alert('Please enter your email address.'); return; }
+
+  const btn = document.getElementById('stripe-pay-btn');
+  btn.textContent = 'Processing…'; btn.disabled = true;
+
+  // OPTION A — Stripe Checkout (redirect, simplest):
+  // Uncomment the block below and comment out Option B once you have your Price ID.
+  /*
+  const session = await fetch('/create-checkout-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ priceId: STRIPE_PRICE_ID, email })
+  }).then(r => r.json());
+  stripe.redirectToCheckout({ sessionId: session.id });
+  return;
+  */
+
+  // OPTION B — Stripe Elements inline (requires server to create PaymentIntent):
+  // For a static HTML site, the easiest path is to use Stripe Checkout (Option A)
+  // with a simple backend (Netlify Function, Vercel Function, or Glitch).
+  // For now this simulates a successful payment so you can test the UI flow:
+  setTimeout(() => {
+    showEnrollSuccess();
+    btn.textContent = '🔒 Pay $19.99'; btn.disabled = false;
+  }, 1800);
+}
+
+// ── PAYPAL SETUP ──
+function initPayPal() {
+  if (typeof paypal_sdk === 'undefined') return;
+  paypal_sdk.Buttons({
+    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 45 },
+    createOrder: (data, actions) => actions.order.create({
+      purchase_units: [{ amount: { value: '19.99', currency_code: 'USD' }, description: 'InkPrint Academy by Regium – Course Enrollment' }]
+    }),
+    onApprove: async (data, actions) => {
+      await actions.order.capture();
+      showEnrollSuccess();
+    },
+    onError: err => {
+      console.error('PayPal error:', err);
+      alert('Payment could not be processed. Please try again or use a card.');
+    }
+  }).render('#paypal-button-container');
+}
+
+// ── SHARED PAYMENT HELPERS ──
+function openPayment() {
+  document.getElementById('paymentModal').classList.add('open');
+  document.getElementById('payStep1').style.display = 'block';
+  document.getElementById('payStep2').style.display = 'none';
+  document.getElementById('enrollSuccess').style.display = 'none';
+  // Init PayPal buttons on first open
+  if (typeof paypal_sdk !== 'undefined' && !document.querySelector('#paypal-button-container iframe')) {
+    initPayPal();
+  }
+}
+
+function closePayment() { document.getElementById('paymentModal').classList.remove('open'); }
+
+function showEnrollSuccess() {
+  document.getElementById('payStep1').style.display = 'none';
+  document.getElementById('payStep2').style.display = 'none';
+  document.getElementById('enrollSuccess').style.display = 'block';
+}
+
+function unlockModules() {
+  document.querySelectorAll('.module.locked').forEach(m => {
+    m.classList.remove('locked');
+    const lock = m.querySelector('.module-lock');
+    if (lock) { lock.textContent = '▾'; }
+    const num = m.querySelector('.module-num');
+    if (num) num.style.background = 'var(--primary)';
+  });
+}
+
+// ── INQUIRY FORM ──
+function submitInquiry(e) {
+  e.preventDefault();
+  document.getElementById('inquiryForm').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+}
+
+// ── CHAT ROOM ──
+const seedMessages = [
+  { user: "Marcus T.", text: "Hey everyone! Just landed my first school district contract. 200 employees to fingerprint over 3 days. 🎉", time: "9:14 AM", color: "#7c3aed" },
+  { user: "Sandra R.", text: "Congrats! I got my first big one from a hospital system last month. The key was going to their HR director directly with a price sheet.", time: "9:22 AM", color: "#059669" },
+  { user: "DeShawn W.", text: "Question — does anyone canvass daycare centers? I've been hitting up childcare facilities and it's converting really well.", time: "9:31 AM", color: "#dc2626" },
+  { user: "Sandra R.", text: "Yes! Daycares are gold. They need prints for every new hire, so it's recurring. Try calling the licensing office to get a list of licensed facilities.", time: "9:38 AM", color: "#059669" },
+  { user: "Priya K.", text: "I've been partnering with a local notary to offer bundled services. She sends me all her apostille clients who need fingerprinting. Win-win!", time: "9:45 AM", color: "#d97706" },
+  { user: "Marcus T.", text: "That's a great idea Priya. I need to find a notary partner in my area. Anyone have a script for reaching out to them?", time: "9:52 AM", color: "#7c3aed" },
+  { user: "Coach Lydia", text: "Module 7 has a full outreach script for notaries, HR, and staffing agencies. Use it word for word — works great cold calling.", time: "10:01 AM", color: "#4f0080" },
+];
+
+function renderChat() {
+  const body = document.getElementById('chatBody');
+  const stored = JSON.parse(localStorage.getItem('inkprint_chat') || '[]');
+  const all = [...seedMessages, ...stored];
+  body.innerHTML = all.map((m, i) => `
+    <div class="chat-msg ${m.mine ? 'mine' : ''}">
+      <div class="chat-avatar" style="background:${m.color || '#4f0080'}">${(m.user||'?')[0].toUpperCase()}</div>
+      <div>
+        <div class="chat-bubble ${m.mine ? 'mine' : ''}">
+          <div class="chat-user">${m.user}</div>
+          <div class="chat-text">${m.text}</div>
+          <div class="chat-time">${m.time}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  body.scrollTop = body.scrollHeight;
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const nameInput = document.getElementById('chatName');
+  const text = input.value.trim();
+  const name = nameInput.value.trim() || 'You';
+  if (!text) return;
+  const now = new Date();
+  const time = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  const colors = ['#7c3aed','#059669','#dc2626','#d97706','#0891b2','#be185d'];
+  const color = colors[Math.floor(Math.random()*colors.length)];
+  const msg = { user: name, text, time, mine: true, color };
+  const stored = JSON.parse(localStorage.getItem('inkprint_chat') || '[]');
+  stored.push(msg);
+  if (stored.length > 50) stored.splice(0, stored.length - 50);
+  localStorage.setItem('inkprint_chat', JSON.stringify(stored));
+  input.value = '';
+  renderChat();
+}
+
+// Simulate random online count
+function updateOnline() {
+  const base = 14;
+  document.getElementById('onlineNum').textContent = base + Math.floor(Math.random()*8);
+}
+
+// ── NAV HAMBURGER ──
+document.getElementById('hamburger').onclick = function() {
+  document.getElementById('navLinks').classList.toggle('open');
+};
+
+// Close modals on overlay click
+document.getElementById('paymentModal').onclick = function(e) { if(e.target===this) closePayment(); };
+document.getElementById('stateModal').onclick = function(e) { if(e.target===this) closeStateModal(); };
+
+// ── INIT ──
+renderStates();
+renderLiveScan();
+renderChat();
+setInterval(updateOnline, 8000);
+
+// Auto-open first module
+document.querySelector('.module .module-body').classList.add('open');
+</script>
+</body>
+</html>
