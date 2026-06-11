@@ -96,8 +96,20 @@
   .section-sub { color: var(--gray-600); font-size: 1.05rem; margin-bottom: 48px; max-width: 640px; }
   .divider { width: 56px; height: 4px; background: var(--accent); border-radius: 2px; margin: 14px 0 28px; }
 
+  /* WHO IS THIS FOR */
+  #who-for { background: white; }
+  .for-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+  .for-card {
+    background: var(--gray-50); border: 1px solid var(--gray-200); border-left: 4px solid var(--accent);
+    border-radius: var(--border-radius); padding: 28px; transition: all 0.2s;
+  }
+  .for-card:hover { box-shadow: var(--shadow); border-color: var(--gray-200); border-left-color: var(--primary); }
+  .for-icon { font-size: 2.2rem; margin-bottom: 14px; }
+  .for-card h3 { font-weight: 800; color: var(--gray-900); margin-bottom: 8px; font-size: 1.1rem; }
+  .for-card p { font-size: 0.9rem; color: var(--gray-600); }
+
   /* COURSES GRID */
-  #all-courses { background: white; }
+  #all-courses { background: var(--gray-50); }
   .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px; }
   .course-card {
     border-radius: 20px; overflow: hidden;
@@ -207,6 +219,7 @@
       <a href="#all-courses">Courses</a>
       <a href="inkprint-academy.html">InkPrint Dept.</a>
       <a href="permit-runner-academy.html">Permit Runner Dept.</a>
+      <a href="free-resources.html">Free Resources</a>
       <a href="#why">Why Regium</a>
       <a href="#all-courses" class="nav-cta">Browse Courses</a>
     </div>
@@ -220,6 +233,7 @@
     <a href="inkprint-academy.html" class="dept-tab">🖐️ InkPrint Academy</a>
     <a href="permit-runner-academy.html" class="dept-tab">📋 Permit Runner Academy</a>
     <a href="process-server-academy.html" class="dept-tab">⚖️ Process Server Academy</a>
+    <a href="free-resources.html" class="dept-tab">📚 Free Resources</a>
   </div>
 </div>
 
@@ -228,12 +242,39 @@
   <div class="hero-inner">
     <div class="hero-eyebrow">🎓 Professional Training Platform</div>
     <h1>Welcome to<br><span>Regium Academy</span></h1>
-    <p>Expert-led, self-paced professional courses designed to launch and grow your service-based business — in any state.</p>
+    <p>Whether you're ready to start your own business, switch careers, or earn extra income on your own schedule — Regium Academy gives you the step-by-step training to get there, in any state.</p>
     <div class="hero-stats">
       <div class="stat"><div class="stat-num">3</div><div class="stat-label">Departments</div></div>
       <div class="stat"><div class="stat-num">50</div><div class="stat-label">States Covered</div></div>
       <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Lifetime Access</div></div>
       <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Self-Paced</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IS THIS FOR -->
+<section id="who-for">
+  <div class="section-inner">
+    <div class="section-label">Is This For You?</div>
+    <h2>Who Is Regium Academy For?</h2>
+    <div class="divider"></div>
+    <p class="section-sub">However you're hoping to grow, there's a path for you here.</p>
+    <div class="for-grid">
+      <div class="for-card">
+        <div class="for-icon">🚀</div>
+        <h3>Future Business Owners</h3>
+        <p>Ready to be your own boss? Our courses walk you through licensing, setup, and landing your first client, so you can launch with confidence.</p>
+      </div>
+      <div class="for-card">
+        <div class="for-icon">🔄</div>
+        <h3>Career Changers</h3>
+        <p>Looking for a new path? No degree required. Learn an in-demand skill and start earning in weeks, not years.</p>
+      </div>
+      <div class="for-card">
+        <div class="for-icon">💡</div>
+        <h3>Side Hustlers</h3>
+        <p>Want flexible income on your own schedule? Self-paced courses fit around your job, family, or life — learn evenings, weekends, whenever works for you.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -423,6 +464,7 @@
     <a href="index.html">Home</a>
     <a href="inkprint-academy.html">InkPrint Academy</a>
     <a href="permit-runner-academy.html">Permit Runner Academy</a>
+    <a href="free-resources.html">Free Resources</a>
     <a href="#all-courses">All Courses</a>
     <a href="#why">Why Regium</a>
   </div>

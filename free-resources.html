@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Resources – Regium Academy</title>
+<style>
+  :root{
+    --purple-dark:#360058;
+    --purple-mid:#4F0080;
+    --purple-light:#6D28D9;
+    --green-dark:#065F46;
+    --green-light:#059669;
+    --blue-dark:#1E3A5F;
+    --blue-light:#1D4ED8;
+    --gold-dark:#92400E;
+    --gold-light:#D97706;
+    --text:#1f2933;
+    --muted:#6b7280;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI", system-ui, sans-serif;
+    color:var(--text);
+    background:#fff;
+    line-height:1.6;
+  }
+  a{text-decoration:none;}
+
+  /* Top nav */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 5%;
+    border-bottom:1px solid #eee;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .logo{
+    font-size:1.4rem;
+    font-weight:700;
+    color:var(--purple-mid);
+  }
+  .logo span{color:var(--text);font-weight:400;}
+  nav a{
+    margin-left:24px;
+    color:var(--text);
+    font-weight:500;
+    font-size:0.95rem;
+  }
+  nav a:hover{color:var(--purple-mid);}
+  .browse-btn{
+    background:var(--purple-light);
+    color:#fff !important;
+    padding:10px 20px;
+    border-radius:10px;
+    font-weight:600;
+  }
+
+  /* Hero */
+  .hero{
+    background:linear-gradient(135deg, var(--purple-dark) 0%, var(--purple-mid) 55%, var(--purple-light) 100%);
+    color:#fff;
+    text-align:center;
+    padding:70px 5% 90px;
+  }
+  .hero .badge{
+    display:inline-block;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.25);
+    border-radius:999px;
+    padding:6px 18px;
+    font-size:0.8rem;
+    letter-spacing:1px;
+    font-weight:700;
+    margin-bottom:24px;
+  }
+  .hero h1{
+    font-size:2.6rem;
+    font-weight:800;
+    margin-bottom:16px;
+  }
+  .hero p{
+    max-width:640px;
+    margin:0 auto;
+    font-size:1.1rem;
+    color:#e5d9f5;
+  }
+
+  /* Resource grid */
+  .resources{
+    max-width:1100px;
+    margin:-50px auto 0;
+    padding:0 5% 80px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
+    gap:28px;
+  }
+  .card{
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .card-banner{
+    padding:26px 24px;
+    color:#fff;
+  }
+  .card-banner .tag{
+    display:inline-block;
+    background:rgba(255,255,255,0.18);
+    border-radius:999px;
+    padding:4px 12px;
+    font-size:0.75rem;
+    font-weight:700;
+    letter-spacing:0.5px;
+    margin-bottom:12px;
+  }
+  .card-banner h2{
+    font-size:1.35rem;
+    font-weight:700;
+  }
+  .banner-purple{background:linear-gradient(135deg, var(--purple-mid) 0%, var(--purple-light) 100%);}
+  .banner-blue{background:linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-light) 100%);}
+  .banner-green{background:linear-gradient(135deg, var(--green-dark) 0%, var(--green-light) 100%);}
+  .banner-gold{background:linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 100%);}
+
+  .card-body{
+    padding:22px 24px 26px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+  }
+  .card-body p{
+    color:var(--muted);
+    font-size:0.95rem;
+    margin-bottom:18px;
+  }
+  .card-body ul{
+    list-style:none;
+    margin-bottom:22px;
+    flex:1;
+  }
+  .card-body li{
+    font-size:0.9rem;
+    margin-bottom:8px;
+    padding-left:24px;
+    position:relative;
+    color:var(--text);
+  }
+  .card-body li::before{
+    content:"✓";
+    color:var(--green-light);
+    font-weight:700;
+    position:absolute;
+    left:0;
+  }
+  .download-btn{
+    display:block;
+    text-align:center;
+    background:var(--purple-light);
+    color:#fff;
+    font-weight:700;
+    padding:13px 18px;
+    border-radius:10px;
+    font-size:0.95rem;
+    transition:opacity 0.15s ease;
+  }
+  .download-btn:hover{opacity:0.9;}
+  .banner-blue + .card-body .download-btn{background:var(--blue-light);}
+  .banner-green + .card-body .download-btn{background:var(--green-light);}
+  .banner-gold + .card-body .download-btn{background:var(--gold-light);}
+
+  /* Featured / own department section */
+  .featured{
+    background:linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+    padding:60px 5% 80px;
+    text-align:center;
+  }
+  .featured-tag{
+    display:inline-block;
+    background:#fef3e2;
+    color:var(--gold-dark);
+    border-radius:999px;
+    padding:6px 18px;
+    font-size:0.8rem;
+    font-weight:700;
+    letter-spacing:1px;
+    margin-bottom:18px;
+  }
+  .featured h2{
+    font-size:2rem;
+    font-weight:800;
+    margin-bottom:14px;
+  }
+  .featured p{
+    max-width:600px;
+    margin:0 auto 28px;
+    color:var(--muted);
+  }
+  .featured .download-btn{
+    max-width:320px;
+    margin:0 auto;
+    background:linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 100%);
+  }
+
+  /* Footer */
+  footer{
+    background:linear-gradient(135deg, var(--purple-dark) 0%, var(--purple-mid) 100%);
+    color:#e5d9f5;
+    text-align:center;
+    padding:40px 5%;
+    font-size:0.85rem;
+  }
+  footer .foot-logo{
+    color:#fff;
+    font-weight:700;
+    font-size:1.1rem;
+    margin-bottom:6px;
+  }
+  footer .foot-links a{
+    color:#e5d9f5;
+    margin:0 10px;
+    font-size:0.85rem;
+  }
+  footer .foot-links{margin:14px 0;}
+  footer .legal{
+    max-width:700px;
+    margin:14px auto 0;
+    color:#cbb6e8;
+    font-size:0.78rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Regium <span>Academy</span></div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="index.html#all-courses">Courses</a>
+    <a href="free-resources.html">Free Resources</a>
+    <a href="index.html#why">Why Regium</a>
+    <a href="index.html#all-courses" class="browse-btn">Browse Courses</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <span class="badge">📚 FREE RESOURCES</span>
+  <h1>Free Tools to Help You Get Started</h1>
+  <p>No strings attached. Download these free guides and templates to help you register your business,
+     get certified, and plan for growth — whether or not you ever take a Regium Academy course.</p>
+</section>
+
+<section class="resources">
+
+  <div class="card">
+    <div class="card-banner banner-blue">
+      <span class="tag">📝 SAM.GOV</span>
+      <h2>SAM.gov Registration Guide</h2>
+    </div>
+    <div class="card-body">
+      <p>A complete step-by-step walkthrough for registering your business in the federal
+         System for Award Management (SAM.gov) — required for federal contracts and many certifications.</p>
+      <ul>
+        <li>What you need before you start</li>
+        <li>Step-by-step registration walkthrough</li>
+        <li>Common mistakes that cause delays</li>
+        <li>What to do after you're approved</li>
+      </ul>
+      <a class="download-btn" href="sam-gov-registration-guide.pdf" download>📥 Download Free PDF</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-banner banner-purple">
+      <span class="tag">👩🏽‍💼 CERTIFICATION</span>
+      <h2>Women-Owned Business Certification Guide</h2>
+    </div>
+    <div class="card-body">
+      <p>A step-by-step guide to getting certified as a Women-Owned Small Business (WOSB/EDWOSB),
+         WBENC, and state-level programs — written especially for women of color entrepreneurs.</p>
+      <ul>
+        <li>Federal WOSB / EDWOSB certification (free)</li>
+        <li>WBENC certification for corporate contracts</li>
+        <li>What certification is actually good for</li>
+        <li>Insider tips most guides leave out</li>
+      </ul>
+      <a class="download-btn" href="women-owned-business-certification-guide.pdf" download>📥 Download Free PDF</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-banner banner-green">
+      <span class="tag">✊🏿 CERTIFICATION</span>
+      <h2>Black-Owned Business Certification Guide</h2>
+    </div>
+    <div class="card-body">
+      <p>A step-by-step guide to NMSDC minority business certification, the SBA 8(a) program, and
+         state-level minority business programs — including what each one is good for.</p>
+      <ul>
+        <li>NMSDC MBE certification walkthrough</li>
+        <li>SBA 8(a) Business Development Program</li>
+        <li>State-level certification overview</li>
+        <li>How to stack certifications for more opportunities</li>
+      </ul>
+      <a class="download-btn" href="black-owned-business-certification-guide.pdf" download>📥 Download Free PDF</a>
+    </div>
+  </div>
+
+</section>
+
+<section class="featured" id="business-plan">
+  <span class="featured-tag">🚀 ITS OWN DEPARTMENT</span>
+  <h2>Free Business Plan Template</h2>
+  <p>A simple, fill-in-the-blank business plan template to help you organize your idea, plan your
+     finances, and get ready for funding, grants, or certification applications.</p>
+  <a class="download-btn" href="business-plan-template.pdf" download>📥 Download Free Template</a>
+</section>
+
+<footer>
+  <div class="foot-logo">Regium Academy</div>
+  <div>Professional Training for Service-Based Entrepreneurs</div>
+  <div class="foot-links">
+    <a href="index.html">Home</a>
+    <a href="inkprint-academy.html">InkPrint Academy</a>
+    <a href="permit-runner-academy.html">Permit Runner Academy</a>
+    <a href="free-resources.html">Free Resources</a>
+  </div>
+  <div class="legal">
+    Regium Academy is a division of Regium, LLC (South Carolina). These free resources are for
+    educational purposes only and do not constitute legal, tax, or business advice. Always verify
+    current requirements with SAM.gov, the SBA, NMSDC, WBENC, and your state's certifying agency.
+    Regium Academy is not affiliated with any government agency. © 2025 Regium, LLC. All rights reserved.
+  </div>
+</footer>
+
+</body>
+</html>
