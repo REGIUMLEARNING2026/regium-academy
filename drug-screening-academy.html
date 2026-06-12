@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drug Screening Academy by Regium – Specimen Collector Certification</title>
+<!-- ══ STRIPE ══ Load Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+<!-- ══ PAYPAL ══ Replace YOUR_PAYPAL_CLIENT_ID with your actual Client ID. Add &enable-funding=venmo to show Venmo button -->
+<script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD&intent=capture&enable-funding=venmo" data-namespace="paypal_sdk"></script>
+<style>
+  :root {
+    --primary: #0f766e;
+    --primary-dark: #134e4a;
+    --accent: #2dd4bf;
+    --accent-light: #99f6e4;
+    --gold: #f59e0b;
+    --white: #ffffff;
+    --gray-50: #fafafa;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --border-radius: 12px;
+    --shadow: 0 4px 24px rgba(15,118,110,0.12);
+    --shadow-lg: 0 8px 48px rgba(15,118,110,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gray-50); color: var(--gray-800); line-height: 1.6; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 1000;
+    background: var(--primary-dark);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 64px;
+  }
+  .logo { color: var(--white); font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; }
+  .logo span { color: var(--accent-light); }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-links a {
+    color: var(--gray-200); text-decoration: none; padding: 8px 12px;
+    border-radius: 8px; font-size: 0.875rem; font-weight: 500; transition: all 0.2s;
+  }
+  .nav-links a:hover { background: rgba(45,212,191,0.2); color: var(--white); }
+  .nav-cta {
+    background: var(--accent); color: var(--primary-dark) !important;
+    padding: 8px 18px !important; border-radius: 8px !important; font-weight: 800 !important;
+  }
+  .nav-cta:hover { background: var(--accent-light) !important; }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 24px; height: 2px; background: white; border-radius: 2px; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, #0d9488 100%);
+    padding: 80px 24px 100px;
+    text-align: center; color: white; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-inner { max-width: 800px; margin: 0 auto; position: relative; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(45,212,191,0.3); border: 1px solid rgba(45,212,191,0.5);
+    color: var(--accent-light); padding: 6px 16px; border-radius: 99px;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 20px; }
+  .hero h1 span { color: var(--accent-light); }
+  .hero p { font-size: 1.15rem; color: rgba(255,255,255,0.85); max-width: 620px; margin: 0 auto 36px; }
+  .hero-cta-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+  .btn-primary {
+    background: var(--gold); color: var(--gray-900); border: none;
+    padding: 14px 32px; border-radius: 10px; font-size: 1rem; font-weight: 800;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: #fbbf24; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,158,11,0.4); }
+  .btn-outline {
+    background: transparent; color: white; border: 2px solid rgba(255,255,255,0.4);
+    padding: 14px 32px; border-radius: 10px; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+  .hero-stats { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 2rem; font-weight: 900; color: var(--accent-light); }
+  .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── SECTION ── */
+  section { padding: 80px 24px; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    display: inline-block; color: var(--primary); font-size: 0.8rem;
+    font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; color: var(--gray-900); margin-bottom: 12px; }
+  .section-sub { color: var(--gray-600); font-size: 1.05rem; max-width: 640px; margin-bottom: 48px; }
+  .divider { width: 60px; height: 4px; background: var(--accent); border-radius: 2px; margin: 16px 0 32px; }
+
+  /* ── WHO NEEDS ── */
+  #who { background: white; }
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .card {
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius); padding: 24px; transition: all 0.2s;
+  }
+  .card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-3px); }
+  .card-icon { font-size: 2rem; margin-bottom: 12px; }
+  .card h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .card p { font-size: 0.875rem; color: var(--gray-600); }
+
+  /* ── COURSE ── */
+  #course { background: linear-gradient(180deg, var(--gray-50) 0%, white 100%); }
+  .price-card {
+    background: linear-gradient(135deg, var(--primary) 0%, #0d9488 100%);
+    color: white; border-radius: 20px; padding: 36px; text-align: center;
+    max-width: 420px; margin: 0 auto 56px; box-shadow: var(--shadow-lg);
+  }
+  .price-card .price { font-size: 3.5rem; font-weight: 900; }
+  .price-card .price sup { font-size: 1.5rem; vertical-align: super; }
+  .price-card .price-label { color: rgba(255,255,255,0.7); font-size: 0.875rem; margin-top: -8px; margin-bottom: 20px; }
+  .price-features { text-align: left; margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+  .price-feature { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+  .price-feature::before { content: '✓'; color: #86efac; font-weight: 800; }
+  .price-btn {
+    width: 100%; background: var(--gold); color: var(--gray-900);
+    border: none; padding: 16px; border-radius: 10px; font-size: 1.1rem;
+    font-weight: 800; cursor: pointer; transition: all 0.2s; margin-top: 8px;
+  }
+  .price-btn:hover { background: #fbbf24; transform: scale(1.02); }
+  .modules { display: flex; flex-direction: column; gap: 16px; }
+  .module {
+    background: white; border: 1px solid var(--gray-200); border-radius: var(--border-radius);
+    overflow: hidden; transition: all 0.2s;
+  }
+  .module.locked { opacity: 0.65; }
+  .module-header {
+    display: flex; align-items: center; gap: 16px; padding: 20px 24px;
+    cursor: pointer; user-select: none;
+  }
+  .module-num {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--primary);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+  }
+  .module.locked .module-num { background: var(--gray-400); }
+  .module-title { flex: 1; font-weight: 700; color: var(--gray-900); }
+  .module-duration { font-size: 0.8rem; color: var(--gray-400); margin-right: 8px; }
+  .module-lock { color: var(--gray-400); }
+  .module-body { padding: 0 24px 20px 76px; display: none; }
+  .module-body.open { display: block; }
+  .module-body ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .module-body li { font-size: 0.9rem; color: var(--gray-600); display: flex; align-items: flex-start; gap: 8px; }
+  .module-body li::before { content: '▸'; color: var(--accent); flex-shrink: 0; }
+  .module-body p { font-size: 0.9rem; color: var(--gray-600); margin-bottom: 8px; }
+
+  /* ── COMPLIANCE ── */
+  #compliance { background: white; }
+  .barriers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .barrier-card {
+    background: var(--gray-50); border-left: 4px solid var(--primary);
+    border-radius: var(--border-radius); padding: 24px;
+  }
+  .barrier-card.warning { border-left-color: var(--warning); }
+  .barrier-card.info { border-left-color: var(--accent); }
+  .barrier-card h3 { font-weight: 700; color: var(--gray-900); margin-bottom: 8px; font-size: 1rem; }
+  .barrier-card p { font-size: 0.875rem; color: var(--gray-600); }
+
+  /* ── BUSINESS RESOURCES ── */
+  #business { background: linear-gradient(180deg, #f0fdfa 0%, white 100%); }
+  .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .resource-card {
+    background: white; border: 1px solid var(--gray-200); border-radius: var(--border-radius);
+    padding: 28px; transition: all 0.2s;
+  }
+  .resource-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-3px); }
+  .resource-icon { font-size: 2.5rem; margin-bottom: 16px; }
+  .resource-card h3 { font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .resource-card p { font-size: 0.875rem; color: var(--gray-600); }
+
+  /* ── CHAT ROOM ── */
+  #chatroom { background: var(--gray-900); color: white; }
+  #chatroom h2 { color: white; }
+  #chatroom .section-sub { color: var(--gray-400); }
+  .chat-container {
+    background: var(--gray-800); border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .chat-header {
+    background: var(--primary); padding: 16px 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .chat-dot { width: 10px; height: 10px; background: #86efac; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .chat-title { font-weight: 700; color: white; }
+  .online-count { font-size: 0.78rem; color: rgba(255,255,255,0.7); margin-left: auto; }
+  .chat-body { height: 360px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .chat-msg { display: flex; gap: 10px; }
+  .chat-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700;
+  }
+  .chat-bubble { background: rgba(255,255,255,0.07); border-radius: 12px; padding: 10px 14px; max-width: 70%; }
+  .chat-bubble.mine { background: var(--primary); margin-left: auto; }
+  .chat-user { font-size: 0.75rem; font-weight: 600; color: var(--accent-light); margin-bottom: 4px; }
+  .chat-text { font-size: 0.875rem; color: rgba(255,255,255,0.9); }
+  .chat-time { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .chat-msg.mine { flex-direction: row-reverse; }
+  .chat-msg.mine .chat-bubble { background: rgba(45,212,191,0.4); }
+  .chat-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .chat-name-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .chat-name-input {
+    flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px; padding: 10px 14px; color: white; font-size: 0.875rem; outline: none;
+  }
+  .chat-name-input::placeholder { color: rgba(255,255,255,0.3); }
+  .chat-input-row { display: flex; gap: 10px; }
+  .chat-input {
+    flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px; padding: 12px 16px; color: white; font-size: 0.9rem; outline: none;
+    transition: border-color 0.2s;
+  }
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-input::placeholder { color: rgba(255,255,255,0.3); }
+  .chat-send {
+    background: var(--accent); border: none; border-radius: 10px; padding: 12px 20px;
+    color: var(--primary-dark); cursor: pointer; font-weight: 700; transition: all 0.2s;
+  }
+  .chat-send:hover { background: var(--accent-light); }
+
+  /* ── INQUIRY FORM ── */
+  #inquiry { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); color: white; }
+  #inquiry h2 { color: white; }
+  #inquiry .section-sub { color: rgba(255,255,255,0.75); }
+  #inquiry .divider { background: var(--accent-light); }
+  .inquiry-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 48px; align-items: start; }
+  .inquiry-info h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; }
+  .inquiry-info ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .inquiry-info li { display: flex; align-items: flex-start; gap: 12px; font-size: 0.9rem; color: rgba(255,255,255,0.85); }
+  .inquiry-info li::before { content: '✉'; }
+  .inquiry-form {
+    background: white; border-radius: 20px; padding: 36px; color: var(--gray-800);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 12px 14px; border: 2px solid var(--gray-200);
+    border-radius: 10px; font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group textarea { min-height: 120px; resize: vertical; }
+  .form-submit {
+    width: 100%; background: var(--primary); color: white; border: none;
+    padding: 14px; border-radius: 10px; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .form-submit:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .form-success {
+    display: none; text-align: center; padding: 24px;
+    color: var(--success); font-weight: 600; font-size: 1.1rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--gray-900); color: var(--gray-400); text-align: center;
+    padding: 48px 24px; font-size: 0.875rem;
+  }
+  footer .footer-logo { font-size: 1.3rem; font-weight: 800; color: white; margin-bottom: 8px; }
+  footer .footer-logo span { color: var(--accent-light); }
+  footer p { margin-bottom: 4px; }
+  footer .footer-links { display: flex; justify-content: center; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
+  footer .footer-links a { color: var(--gray-400); text-decoration: none; font-size: 0.8rem; }
+  footer .footer-links a:hover { color: var(--accent-light); }
+  .disclaimer {
+    max-width: 800px; margin: 16px auto 0;
+    font-size: 0.75rem; color: var(--gray-600); line-height: 1.6;
+  }
+
+  /* ── PAYMENT MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 2000; align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 20px; max-width: 620px; width: 100%;
+    max-height: 80vh; overflow-y: auto; padding: 36px; position: relative;
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px; background: var(--gray-100);
+    border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer;
+    font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+  }
+  .payment-modal .modal { max-width: 480px; }
+  .payment-form .form-group { margin-bottom: 16px; }
+  .payment-form input { width: 100%; padding: 12px; border: 2px solid var(--gray-200); border-radius: 8px; font-size: 0.9rem; outline: none; }
+  .payment-form input:focus { border-color: var(--accent); }
+  .payment-note { font-size: 0.78rem; color: var(--gray-400); text-align: center; margin-top: 12px; }
+
+  .enroll-success { display: none; text-align: center; padding: 32px; }
+  .enroll-success .big-check { font-size: 4rem; margin-bottom: 16px; }
+  .enroll-success h3 { color: var(--success); font-size: 1.4rem; margin-bottom: 8px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .nav-links.open { display: flex; flex-direction: column; position: absolute; top: 64px; left: 0; right: 0; background: var(--primary-dark); padding: 16px; }
+    .inquiry-layout { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .hero-stats { gap: 24px; }
+    section { padding: 56px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Drug<span>Screening</span> Academy <small style="font-size:0.55rem;font-weight:400;opacity:0.75;letter-spacing:1px;text-transform:uppercase">by Regium</small></a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" style="color:var(--accent-light);font-weight:600">← All Departments</a>
+      <a href="#who">Who Needs It</a>
+      <a href="#course">Course</a>
+      <a href="#compliance">Compliance</a>
+      <a href="#business">Start a Business</a>
+      <a href="#chatroom">Community</a>
+      <a href="#inquiry">Contact</a>
+      <a href="#course" class="nav-cta">Enroll – $19.99</a>
+    </div>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- ── DEPT TABS ── -->
+<div style="background:white;border-bottom:2px solid #f3f4f6;position:sticky;top:64px;z-index:90;">
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px;display:flex;gap:4px;overflow-x:auto;">
+    <a href="index.html" style="padding:14px 20px;font-size:0.875rem;font-weight:700;color:#4b5563;border-bottom:3px solid transparent;text-decoration:none;white-space:nowrap;transition:all 0.2s;">🏛️ All Departments</a>
+    <a href="inkprint-academy.html" style="padding:14px 20px;font-size:0.875rem;font-weight:700;color:#4b5563;border-bottom:3px solid transparent;text-decoration:none;white-space:nowrap;transition:all 0.2s;">🖐️ InkPrint Academy</a>
+    <a href="permit-runner-academy.html" style="padding:14px 20px;font-size:0.875rem;font-weight:700;color:#4b5563;border-bottom:3px solid transparent;text-decoration:none;white-space:nowrap;transition:all 0.2s;">📋 Permit Runner Academy</a>
+    <a href="process-server-academy.html" style="padding:14px 20px;font-size:0.875rem;font-weight:700;color:#4b5563;border-bottom:3px solid transparent;text-decoration:none;white-space:nowrap;transition:all 0.2s;">⚖️ Process Server Academy</a>
+    <a href="drug-screening-academy.html" style="padding:14px 20px;font-size:0.875rem;font-weight:700;color:#0f766e;border-bottom:3px solid #2dd4bf;text-decoration:none;white-space:nowrap;">🧪 Drug Screening Academy</a>
+  </div>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🎓 Self-Paced Online Course</div>
+    <h1>Become a Certified<br><span>Specimen Collector</span></h1>
+    <p>Master multi-panel urine drug test collection procedures, federal and state compliance, and build a career or business in specimen collection — at your own pace.</p>
+    <div class="hero-cta-group">
+      <a href="#course" class="btn-primary">🚀 Enroll Now – $19.99</a>
+      <a href="#course" class="btn-outline">View Curriculum</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">14</div><div class="stat-label">Course Modules</div></div>
+      <div class="stat"><div class="stat-num">50</div><div class="stat-label">States Covered</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Lifetime Access</div></div>
+      <div class="stat"><div class="stat-num">$19.99</div><div class="stat-label">One-Time Fee</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHO NEEDS SPECIMEN COLLECTORS ── -->
+<section id="who">
+  <div class="section-inner">
+    <div class="section-label">Market Opportunity</div>
+    <h2>Who Needs Specimen Collectors?</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Drug and alcohol testing is required across dozens of industries and government programs. Trained collectors are in steady demand nationwide.</p>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-icon">🚛</div>
+        <h3>Trucking & Transportation</h3>
+        <p>DOT-regulated drivers and operators under FMCSA, FAA, FRA, FTA, PHMSA, and Coast Guard rules require regular drug and alcohol testing.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏗️</div>
+        <h3>Construction & Manufacturing</h3>
+        <p>Pre-employment, random, and post-accident testing are standard for safety-sensitive jobsite roles.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏥</div>
+        <h3>Hospitals & Clinics</h3>
+        <p>Emergency departments and occupational health clinics use rapid cups for clinical toxicology screening and employee testing.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏢</div>
+        <h3>Third-Party Administrators</h3>
+        <p>TPAs coordinate testing programs for multiple employers and frequently subcontract collections to independent collectors.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚖️</div>
+        <h3>Corrections & Drug Courts</h3>
+        <p>Corrections facilities, probation and parole offices, and drug court programs rely on routine specimen collection.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏫</div>
+        <h3>Schools & Athletics</h3>
+        <p>School districts and athletic programs use drug screening as part of student and staff policies.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <h3>Staffing Agencies</h3>
+        <p>Staffing, logistics, and warehousing companies need fast, reliable pre-placement and random testing for their workforce.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚐</div>
+        <h3>Mobile Collection Services</h3>
+        <p>Mobile collectors travel to job sites, warehouses, and offices — a flexible, in-demand service model.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COURSE ── -->
+<section id="course">
+  <div class="section-inner">
+    <div class="section-label">Self-Paced Training</div>
+    <h2>Multi-Panel Urine Drug Screening Course</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Specimen Collector Certification and Career Program. Work through each module on your own schedule. No deadlines. Lifetime access. One low price.</p>
+
+    <div class="price-card">
+      <div class="price"><sup>$</sup>19.99</div>
+      <div class="price-label">One-time payment · Lifetime access</div>
+      <div class="price-features">
+        <div class="price-feature">All 14 course modules (self-paced)</div>
+        <div class="price-feature">Drug classes, panels & cutoff concentrations</div>
+        <div class="price-feature">Step-by-step collection & validity procedures</div>
+        <div class="price-feature">Chain of custody & documentation training</div>
+        <div class="price-feature">Federal (DOT/SAMHSA) & state compliance overview</div>
+        <div class="price-feature">Career pathways & business startup toolkit</div>
+        <div class="price-feature">Community chat room access</div>
+        <div class="price-feature">Final knowledge check & Certificate of Completion</div>
+      </div>
+      <button class="price-btn" onclick="openPayment()">🚀 Enroll Now for $19.99</button>
+    </div>
+
+    <div class="modules" id="modulesContainer">
+      <!-- Module 1 -->
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">1</div>
+          <div class="module-title">Welcome and Course Overview</div>
+          <span class="module-duration">~20 min</span>
+          <span>▾</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>How rapid multi-panel urine drug test cups work, and what results do and do not mean</li>
+            <li>Drug classes commonly included in multi-panel screening devices and typical cutoff concentrations</li>
+            <li>How to perform a compliant, defensible specimen collection from start to finish</li>
+            <li>Specimen validity checks, including temperature and adulteration screening</li>
+            <li>How to read negative, preliminary positive, and invalid results</li>
+            <li>Chain of custody documentation, including the federal Custody and Control Form (CCF)</li>
+            <li>The federal regulatory framework and state-level differences that affect testing programs</li>
+            <li>Career paths and the steps to launch your own specimen collection business</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 2 -->
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">2</div>
+          <div class="module-title">Understanding Rapid Multi-Panel Urine Drug Test Devices</div>
+          <span class="module-duration">~45 min</span>
+          <span>▾</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>FDA 510(k)-cleared, single-use in vitro diagnostic devices that combine a collection cup with built-in immunoassay test strips</li>
+            <li>Used for pre-employment, random, reasonable suspicion, post-accident, return-to-duty, corrections intake, and clinical triage</li>
+            <li>A screening tool only — presumptive results must be confirmed by an accredited laboratory using GC/MS or LC/MS-MS</li>
+            <li>Common drug classes: Amphetamine (AMP), Barbiturates (BAR), Benzodiazepines (BZO), Cocaine metabolite (COC), MDMA, Marijuana metabolite (THC), Methadone (MTD), Methamphetamine (mAMP), Opiates (OPI), Oxycodone (OXY), Phencyclidine (PCP), and Tricyclic Antidepressants (TCA)</li>
+            <li>Panel configurations range from 5-panel devices up to 14+ analytes — always confirm the exact configuration on the packaging</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 3 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">3</div>
+          <div class="module-title">Cutoff Concentrations and Test Panels</div>
+          <span class="module-duration">~45 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>What a cutoff concentration (ng/mL) means and how it determines whether a line appears in the test region</li>
+            <li>Typical screening cutoffs aligned with the SAMHSA Mandatory Guidelines for Federal Workplace Drug Testing, effective February 2024</li>
+            <li>Key 2024 updates: the morphine confirmatory cutoff rose to 4,000 ng/mL, and the cocaine metabolite initial cutoff dropped to 150 ng/mL</li>
+            <li>How to read the part number, lot number, and expiration date on every device's foil pouch before use</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 4 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">4</div>
+          <div class="module-title">Preparing for the Collection</div>
+          <span class="module-duration">~30 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Verifying the device: correct panel configuration, pouch integrity, expiration date, and lot number</li>
+            <li>Preparing the collection area: securing water sources, bluing agent, soap, and other liquids per program policy</li>
+            <li>Verifying donor identity with government-issued photo ID and documenting it on the CCF</li>
+            <li>Donor instructions: outer garments, personal belongings, and washing/drying hands before providing a specimen</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 5 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">5</div>
+          <div class="module-title">Step-by-Step Specimen Collection Procedure</div>
+          <span class="module-duration">~45 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Confirm donor identity and complete the collector and donor sections of the Custody and Control Form</li>
+            <li>Inspect and open an unexpired device with the correct panel configuration in front of the donor</li>
+            <li>Hand the donor the empty cup and direct them to fill it to at least the minimum fill line</li>
+            <li>Read the temperature strip within four minutes of receiving the specimen</li>
+            <li>Visually inspect the specimen for unusual color, odor, or signs of dilution or tampering</li>
+            <li>Seal the lid tightly and begin timing the test per the manufacturer's instructions</li>
+            <li>Complete the remaining chain of custody documentation while the test develops</li>
+            <li>Always use gloves and follow bloodborne pathogen and infection control policies</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 6 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">6</div>
+          <div class="module-title">Specimen Validity Checks</div>
+          <span class="module-duration">~30 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Reading the built-in temperature strip within four minutes — acceptable range is approximately 90–100°F (32–38°C)</li>
+            <li>Visual inspection for possible adulteration: unusual color, chemical or bleach-like odor, excessive foaming, or foreign objects</li>
+            <li>What to do when a specimen fails validity checks: document the irregularity on the CCF, notify the program representative, and follow protocol for an observed recollection</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 7 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">7</div>
+          <div class="module-title">Performing the Test and Reading Results</div>
+          <span class="module-duration">~45 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Activating the test strips and timing the development window — typically 5 minutes, but always confirm the manufacturer's validity window</li>
+            <li>Reading the control (C) and test (T) regions on each panel independently — never compare line intensity across panels</li>
+            <li>Negative: lines appear in both regions (even faint). Preliminary positive: control line only. Invalid: no control line — repeat with a new device</li>
+            <li>A faint test-region line is still a negative result and should never be treated as borderline</li>
+            <li>Every preliminary positive must be sent to a certified laboratory for GC/MS or LC/MS-MS confirmation before any decision is made</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 8 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">8</div>
+          <div class="module-title">Documentation and Chain of Custody</div>
+          <span class="module-duration">~45 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Use blue or black ballpoint pen only on labels and forms — never red ink, felt-tip, or pencil</li>
+            <li>Completing the Custody and Control Form (CCF): employer and donor information, requested panel, temperature reading and irregularities</li>
+            <li>Affixing the specimen ID label and placing the tamper-evident security seal, initialed and dated by the donor</li>
+            <li>The donor signs the certification statement; the collector signs and dates the collector certification section</li>
+            <li>Distributing CCF copies: laboratory copy travels with the specimen, employer copy retained, donor copy provided</li>
+            <li>Sealing the specimen so that any tampering would visibly disturb the seal</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 9 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">9</div>
+          <div class="module-title">Packaging, Storage, and Shipping</div>
+          <span class="module-duration">~30 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Place the sealed specimen and absorbent material into the lab bag; keep the CCF paperwork in its separate pocket, never touching the container</li>
+            <li>Place the bagged specimen into a crush-resistant shipping container or approved clinical shipping pak</li>
+            <li>Store packages in a secure, access-controlled area until courier pickup, and retain tracking information</li>
+            <li>Store unused devices at room temperature, generally 35–77°F (2–25°C) — discard devices exposed to extreme temperatures</li>
+            <li>Retain CCFs, temperature logs, and incident documentation per your recordkeeping policy and applicable retention requirements</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 10 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">10</div>
+          <div class="module-title">The Federal Regulatory Framework</div>
+          <span class="module-duration">~45 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>49 CFR Part 40 governs safety-sensitive transportation employees under FMCSA, FAA, FRA, FTA, PHMSA, and the U.S. Coast Guard</li>
+            <li>DOT collectors must complete qualification training, including regulations/procedures and error-free mock collections, with refresher training at least every five years</li>
+            <li>A donor's immediate supervisor generally may not collect that donor's specimen unless no other collector is available and agency rules permit it</li>
+            <li>SAMHSA Mandatory Guidelines for Federal Workplace Drug Testing (effective Feb 2024) set the authorized panel, cutoffs, lab certification standards, and the Medical Review Officer's role</li>
+            <li>Non-regulated private employer programs aren't bound by Part 40 but often adopt similar best practices for defensibility and fairness</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 11 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">11</div>
+          <div class="module-title">State-by-State Compliance Considerations</div>
+          <span class="module-duration">~45 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>The Federal Floor: for DOT-regulated positions, federal law controls — a state medical marijuana card never excuses a positive test</li>
+            <li>Category 1 — States limiting employer action on cannabis: CA, NY, NJ, IL, CT, NV, WA, MT, AZ, RI, MA, MN, PA, and others (protections vary widely by state)</li>
+            <li>Category 2 — States with procedural requirements (written policy, confirmation testing, split-specimen rights): VT, CT, MN, IA, ME, RI</li>
+            <li>Category 3 — States with voluntary Drug-Free Workplace Programs offering workers' comp discounts: FL, GA, TN, OH, MS, AL, AR, SC, VA, KY</li>
+            <li>Category 4 — States restricting random testing for non-safety-sensitive employees: CT, IA, MN, MT, RI, VT</li>
+            <li>Practical intake questions for every new client: Is the position DOT-regulated? Does the state limit marijuana-related actions? Are written policy or confirmation requirements in place? Is the employer pursuing a certified Drug-Free Workplace Program?</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 12 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">12</div>
+          <div class="module-title">Career Pathways for Certified Collectors</div>
+          <span class="module-duration">~30 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>In-demand employers: occupational health clinics, hospitals/EDs, third-party administrators, mobile collection companies, corrections/probation, schools/athletics, and staffing/trucking/construction/logistics companies</li>
+            <li>Stackable credentials: DOT Urine Specimen Collector (49 CFR Part 40 Subpart C), non-DOT collector training, Breath Alcohol Technician (BAT) certification, oral fluid and hair follicle collection training</li>
+            <li>Most collector qualifications, including DOT status, must be refreshed at least every five years</li>
+            <li>Professional conduct: punctual, calm under pressure, strict confidentiality, consistent procedures, and thorough documentation that may be reviewed long after the collection</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 13 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">13</div>
+          <div class="module-title">Building Your Own Specimen Collection Business</div>
+          <span class="module-duration">~60 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>Step 1–2: Get trained and certified (DOT, non-DOT, BAT), then write a simple one-to-two page business plan</li>
+            <li>Step 3–4: Form an LLC, get your EIN, open a business bank account, and obtain required local/state licenses (e.g., CLIA Certificate of Waiver via CMS-116)</li>
+            <li>Step 5: Secure general liability and professional liability (E&O) insurance — many carry $1M/occurrence, $2M aggregate — plus commercial auto if mobile</li>
+            <li>Step 6: Purchase equipment — multi-panel cups, CCFs and labels, specimen bags, PPE, breathalyzer, and secure storage/transport</li>
+            <li>Step 7–8: Establish lab and MRO relationships, and write SOPs covering collection, validity handling, documentation, and privacy</li>
+            <li>Step 9–10: Set your pricing (base collection fee, travel fee, lab/MRO pass-through) and market to trucking, construction, staffing agencies, and TPAs</li>
+            <li>Step 11–12: Operate compliantly day to day, then scale with additional collectors, service lines (oral fluid, hair), and Drug-Free Workplace certification</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Module 14 -->
+      <div class="module locked" onclick="toggleModule(this)">
+        <div class="module-header">
+          <div class="module-num">14</div>
+          <div class="module-title">Final Knowledge Check</div>
+          <span class="module-duration">~20 min</span>
+          <span class="module-lock">🔒</span>
+        </div>
+        <div class="module-body">
+          <ul>
+            <li>A 10-question knowledge check covering screening devices, cutoffs, validity testing, chain of custody, and federal/state compliance</li>
+            <li>Review your answers against the included answer key</li>
+            <li>Printable Drug Screening Academy Certificate of Completion</li>
+            <li>Resources for continued learning: SAMHSA, DOT/ODAPC, 49 CFR Part 40, FDA 510(k) database, and CMS CLIA program information</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COMPLIANCE ── -->
+<section id="compliance">
+  <div class="section-inner">
+    <div class="section-label">Know Before You Start</div>
+    <h2>Federal &amp; State Compliance Overview</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Drug testing law varies by jurisdiction and changes frequently. This is general educational information, not legal advice — always confirm current requirements with your state agency and qualified counsel.</p>
+    <div class="barriers-grid">
+      <div class="barrier-card info">
+        <h3>🟦 DOT — 49 CFR Part 40</h3>
+        <p>Safety-sensitive transportation employees (FMCSA, FAA, FRA, FTA, PHMSA, Coast Guard) are subject to Part 40. Marijuana remains prohibited regardless of state law, and a medical marijuana card never excuses a positive result for a DOT-regulated employee.</p>
+      </div>
+      <div class="barrier-card info">
+        <h3>🟦 SAMHSA Mandatory Guidelines</h3>
+        <p>Federal workplace programs follow the SAMHSA Mandatory Guidelines (effective Feb 2024), which set the authorized panel, cutoff concentrations, lab certification standards, and the Medical Review Officer's role.</p>
+      </div>
+      <div class="barrier-card warning">
+        <h3>🟡 Category 1: Cannabis Action Limits</h3>
+        <p>States including CA, NY, NJ, IL, CT, NV, WA, MT, AZ, RI, MA, MN, and PA restrict how non-DOT employers may treat a positive marijuana test or off-duty cannabis use, especially for medical cardholders.</p>
+      </div>
+      <div class="barrier-card warning">
+        <h3>🟡 Category 2: Procedural Requirements</h3>
+        <p>States such as VT, CT, MN, IA, ME, and RI may require a written drug testing policy, confirmation of any positive screen before adverse action, and donor rights to a split specimen or retest.</p>
+      </div>
+      <div class="barrier-card">
+        <h3>🟩 Category 3: Drug-Free Workplace Programs</h3>
+        <p>FL, GA, TN, OH, MS, AL, AR, SC, VA, and KY offer workers' comp premium discounts to employers who certify a Drug-Free Workplace Program meeting state requirements.</p>
+      </div>
+      <div class="barrier-card warning">
+        <h3>🟡 Category 4: Random Testing Limits</h3>
+        <p>CT, IA, MN, MT, RI, and VT limit or prohibit random testing for non-safety-sensitive private-sector employees, generally requiring reasonable suspicion or another justification.</p>
+      </div>
+      <div class="barrier-card info">
+        <h3>🟦 Confirmation Is Mandatory</h3>
+        <p>Any preliminary positive screening result must be sent to an independent, certified laboratory for GC/MS or LC/MS-MS confirmation before any employment, clinical, or legal decision is made.</p>
+      </div>
+      <div class="barrier-card">
+        <h3>🟩 Intake Checklist for New Clients</h3>
+        <p>Is the position DOT-regulated? Does the state limit marijuana-related employer actions? Does the state require a written policy or confirmation testing? Is the employer pursuing Drug-Free Workplace certification?</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BUSINESS RESOURCES ── -->
+<section id="business">
+  <div class="section-inner">
+    <div class="section-label">Entrepreneur Toolkit</div>
+    <h2>Build Your Specimen Collection Business</h2>
+    <div class="divider"></div>
+    <p class="section-sub">A roadmap for launching a mobile or independent specimen collection business — serving employers directly or as a subcontractor for labs and TPAs.</p>
+    <div class="resources-grid">
+      <div class="resource-card">
+        <div class="resource-icon">🏢</div>
+        <h3>Form Your Business Entity</h3>
+        <p>Form an LLC to separate personal and business liability. Register with your Secretary of State, get a free EIN from the IRS, and open a dedicated business bank account.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">🎓</div>
+        <h3>Stack Your Credentials</h3>
+        <p>Beyond this course, pursue DOT and non-DOT collector training and Breath Alcohol Technician (BAT) certification. Refresh DOT credentials at least every five years.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">🧰</div>
+        <h3>Equipment & Supplies</h3>
+        <p>FDA-cleared multi-panel cups in the configurations clients need, CCFs and specimen labels, specimen bags and crush-resistant shipping containers, gloves, and a breathalyzer if offering alcohol testing.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">🔐</div>
+        <h3>Licenses & Registrations</h3>
+        <p>Common requirements include a general business license and a CLIA Certificate of Waiver (CMS-116) for point-of-care testing. Some states require additional licensing for blood-draw services.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">🛡️</div>
+        <h3>Insurance & Liability</h3>
+        <p>Carry general liability and professional liability (errors & omissions) coverage — many businesses in this field carry $1M per occurrence / $2M aggregate — plus commercial auto for mobile services.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">🔬</div>
+        <h3>Lab & MRO Partnerships</h3>
+        <p>Identify a SAMHSA-certified laboratory for confirmation testing and establish a relationship with a Medical Review Officer to review and verify positive results.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">💲</div>
+        <h3>Pricing Your Services</h3>
+        <p>Charge a base collection fee per donor, an additional travel/trip fee for mobile services, and pass through laboratory confirmation and MRO review costs. Offer volume rates for larger contracts.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">📣</div>
+        <h3>Marketing & Client Acquisition</h3>
+        <p>Reach out to trucking, construction, manufacturing, and staffing companies; network with occupational health clinics and TPAs; build a simple website and local search presence; ask for referrals.</p>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">📈</div>
+        <h3>Operate & Scale</h3>
+        <p>Maintain accurate records, keep training current with refreshers every five years, and revisit state requirements for each new client. Scale by adding collectors, oral fluid/hair testing, and Drug-Free Workplace certification.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CHAT ROOM ── -->
+<section id="chatroom">
+  <div class="section-inner">
+    <div class="section-label">Community</div>
+    <h2>Collector Community Chat Room</h2>
+    <div class="divider" style="background: var(--accent-light);"></div>
+    <p class="section-sub">Connect with fellow specimen collectors. Share tips, leads, and compliance questions.</p>
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="chat-dot"></div>
+        <div class="chat-title">Drug Screening Academy Community</div>
+        <div class="online-count" id="onlineCount">🟢 <span id="onlineNum">11</span> online</div>
+      </div>
+      <div class="chat-body" id="chatBody"></div>
+      <div class="chat-footer">
+        <div class="chat-name-row">
+          <input type="text" class="chat-name-input" id="chatName" placeholder="Your name or nickname" maxlength="30">
+        </div>
+        <div class="chat-input-row">
+          <input type="text" class="chat-input" id="chatInput" placeholder="Share a tip, ask a question..." maxlength="300" onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">Send ➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INQUIRY FORM ── -->
+<section id="inquiry">
+  <div class="section-inner">
+    <div class="section-label">Get Answers</div>
+    <h2>Submit an Inquiry</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Have a question about specimen collection, certification, or starting your business? Ask our team.</p>
+    <div class="inquiry-layout">
+      <div class="inquiry-info">
+        <h3>We're here to help</h3>
+        <ul>
+          <li>Questions about course content or certification</li>
+          <li>Help understanding federal vs. state requirements</li>
+          <li>Guidance on starting or expanding a specimen collection business</li>
+          <li>Technical questions about devices and procedures</li>
+          <li>General course questions and enrollment support</li>
+        </ul>
+      </div>
+      <div class="inquiry-form" id="inquiryFormContainer">
+        <form id="inquiryForm" onsubmit="submitInquiry(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name *</label>
+              <input type="text" required placeholder="Jane">
+            </div>
+            <div class="form-group">
+              <label>Last Name *</label>
+              <input type="text" required placeholder="Smith">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" required placeholder="jane@example.com">
+          </div>
+          <div class="form-group">
+            <label>Your State</label>
+            <select id="inquiryState">
+              <option value="">Select your state...</option>
+              <option>Alabama</option><option>Alaska</option><option>Arizona</option>
+              <option>Arkansas</option><option>California</option><option>Colorado</option>
+              <option>Connecticut</option><option>Delaware</option><option>Florida</option>
+              <option>Georgia</option><option>Hawaii</option><option>Idaho</option>
+              <option>Illinois</option><option>Indiana</option><option>Iowa</option>
+              <option>Kansas</option><option>Kentucky</option><option>Louisiana</option>
+              <option>Maine</option><option>Maryland</option><option>Massachusetts</option>
+              <option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
+              <option>Missouri</option><option>Montana</option><option>Nebraska</option>
+              <option>Nevada</option><option>New Hampshire</option><option>New Jersey</option>
+              <option>New Mexico</option><option>New York</option><option>North Carolina</option>
+              <option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
+              <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option>
+              <option>South Carolina</option><option>South Dakota</option><option>Tennessee</option>
+              <option>Texas</option><option>Utah</option><option>Vermont</option>
+              <option>Virginia</option><option>Washington</option><option>West Virginia</option>
+              <option>Wisconsin</option><option>Wyoming</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Topic</label>
+            <select>
+              <option>Course / Certification Question</option>
+              <option>Federal Compliance (DOT/SAMHSA)</option>
+              <option>State Compliance</option>
+              <option>Starting a Business</option>
+              <option>Equipment Help</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Your Question *</label>
+            <textarea required placeholder="Describe your question in detail..."></textarea>
+          </div>
+          <button type="submit" class="form-submit">📨 Submit Inquiry</button>
+        </form>
+        <div class="form-success" id="formSuccess">
+          <div style="font-size:3rem;margin-bottom:12px">✅</div>
+          <div>Thank you! Your inquiry has been received. We'll respond within 1–2 business days.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">Drug<span>Screening</span> Academy <small style="font-size:0.6rem;font-weight:400;opacity:0.6;letter-spacing:1px;text-transform:uppercase">by Regium</small></div>
+  <p>A Department of <a href="index.html" style="color:var(--accent-light);text-decoration:none;font-weight:600">Regium Academy</a> · Multi-Panel Urine Drug Screening Specimen Collector Certification</p>
+  <div class="footer-links">
+    <a href="index.html">← Regium Academy Home</a>
+    <a href="inkprint-academy.html">InkPrint Dept.</a>
+    <a href="permit-runner-academy.html">Permit Runner Dept.</a>
+    <a href="process-server-academy.html">Process Server Dept.</a>
+    <a href="free-resources.html">Free Resources</a>
+    <a href="#who">Who Needs It</a>
+    <a href="#course">Course</a>
+    <a href="#compliance">Compliance</a>
+    <a href="#business">Start a Business</a>
+    <a href="#chatroom">Community</a>
+    <a href="#inquiry">Contact</a>
+  </div>
+  <p class="disclaimer">
+    Drug Screening Academy provides educational content for informational purposes only and does not constitute legal, medical, or compliance advice.
+    Drug testing regulations vary by state and change frequently — always verify current requirements with the relevant federal and state agencies and qualified counsel before designing or administering a testing program.
+    Drug Screening Academy is not a government agency and is not affiliated with SAMHSA, DOT, the FDA, or any state government body.
+    © 2026 Regium, LLC. All rights reserved.
+  </p>
+</footer>
+
+<!-- ── PAYMENT MODAL ── -->
+<div class="modal-overlay payment-modal" id="paymentModal">
+  <div class="modal" style="max-width:500px">
+    <button class="modal-close" onclick="closePayment()">✕</button>
+
+    <!-- Step 1: Choose method -->
+    <div id="payStep1">
+      <h3 style="font-size:1.3rem;font-weight:800;color:var(--primary);margin-bottom:6px">🎓 Enroll in Drug Screening Academy</h3>
+      <p style="font-size:0.875rem;color:#6b7280;margin-bottom:24px">One-time payment of <strong style="color:var(--gray-900)">$19.99</strong> · Lifetime access · No subscription</p>
+
+      <!-- Stripe card button -->
+      <button onclick="showStripeForm()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:#635bff;color:white;border:none;padding:15px;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:12px;transition:opacity 0.2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        Pay with Card (Stripe)
+      </button>
+
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
+        <div style="flex:1;height:1px;background:#e5e7eb"></div>
+        <span style="font-size:0.8rem;color:#9ca3af;font-weight:500">or pay with</span>
+        <div style="flex:1;height:1px;background:#e5e7eb"></div>
+      </div>
+
+      <!-- PayPal + Venmo buttons rendered by SDK -->
+      <div id="paypal-button-container"></div>
+      <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin-top:14px">🔒 All payments are secure & encrypted · 30-day money-back guarantee</p>
+    </div>
+
+    <!-- Step 2: Stripe card form -->
+    <div id="payStep2" style="display:none">
+      <button onclick="document.getElementById('payStep2').style.display='none';document.getElementById('payStep1').style.display='block'" style="background:none;border:none;color:var(--accent);font-size:0.85rem;font-weight:600;cursor:pointer;margin-bottom:16px;padding:0">← Back</button>
+      <h3 style="font-size:1.2rem;font-weight:800;color:var(--primary);margin-bottom:4px">Pay with Card</h3>
+      <p style="font-size:0.875rem;color:#6b7280;margin-bottom:20px">Secure payment via <strong>Stripe</strong> · $19.99</p>
+
+      <div style="margin-bottom:16px">
+        <label style="font-size:0.82rem;font-weight:600;color:#374151;display:block;margin-bottom:6px">Email</label>
+        <input type="email" id="stripeEmail" placeholder="you@example.com" style="width:100%;padding:11px 13px;border:2px solid #e5e7eb;border-radius:9px;font-size:0.9rem;outline:none;transition:border-color 0.2s" onfocus="this.style.borderColor='#2dd4bf'" onblur="this.style.borderColor='#e5e7eb'">
+      </div>
+
+      <!-- Stripe Elements mounts here -->
+      <div style="margin-bottom:16px">
+        <label style="font-size:0.82rem;font-weight:600;color:#374151;display:block;margin-bottom:6px">Card Details</label>
+        <div id="stripe-card-element" style="padding:12px 13px;border:2px solid #e5e7eb;border-radius:9px;background:white;min-height:42px"></div>
+        <div id="stripe-card-errors" style="color:#ef4444;font-size:0.8rem;margin-top:6px"></div>
+      </div>
+
+      <button id="stripe-pay-btn" onclick="handleStripePayment()" style="width:100%;background:#635bff;color:white;border:none;padding:14px;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity 0.2s">
+        🔒 Pay $19.99
+      </button>
+      <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin-top:10px">Powered by Stripe · Your card info is never stored on our servers</p>
+    </div>
+
+    <!-- Success state -->
+    <div class="enroll-success" id="enrollSuccess">
+      <div class="big-check">🎉</div>
+      <h3>You're enrolled!</h3>
+      <p style="color:#4b5563;margin-bottom:16px">Welcome to Drug Screening Academy by Regium. All modules are now unlocked. Check your email for access details.</p>
+      <button onclick="unlockModules(); closePayment();" style="background:var(--primary);color:white;border:none;padding:12px 28px;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer">
+        Start Learning →
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── MODULE TOGGLE ──
+function toggleModule(el) {
+  const body = el.querySelector('.module-body');
+  body.classList.toggle('open');
+  const arr = el.querySelector('.module-header span:last-child');
+  if (arr && !arr.textContent.includes('🔒')) arr.textContent = body.classList.contains('open') ? '▴' : '▾';
+}
+
+// ══════════════════════════════════════════════
+// PAYMENT CONFIGURATION — SWAP IN YOUR KEYS HERE
+// ══════════════════════════════════════════════
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51TdwFdH90tmu5OvoUIuCK6LFKaJ2Qj8O8YR8Au3ORLVli7Nnp6QqH4QUxycKnmqPcKhKnjnkqWTiGfh0kq5X3sug00LY6ED0kT';
+// After creating your $19.99 product in Stripe Dashboard → Catalog → Products,
+// paste the Price ID below (starts with price_...):
+const STRIPE_PRICE_ID = 'price_1TdwSRH90tmu5OvoEzjhzkmA';
+
+// PayPal: replace YOUR_PAYPAL_CLIENT_ID in the <script> tag in the <head> above.
+// ══════════════════════════════════════════════
+
+// ── STRIPE SETUP ──
+let stripe, stripeCardElement;
+
+function initStripe() {
+  if (typeof Stripe === 'undefined') return;
+  stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+  const elements = stripe.elements();
+  stripeCardElement = elements.create('card', {
+    style: {
+      base: { fontSize: '15px', color: '#1f2937', fontFamily: 'Segoe UI, system-ui, sans-serif', '::placeholder': { color: '#9ca3af' } },
+      invalid: { color: '#ef4444' }
+    }
+  });
+  stripeCardElement.mount('#stripe-card-element');
+  stripeCardElement.on('change', e => {
+    document.getElementById('stripe-card-errors').textContent = e.error ? e.error.message : '';
+  });
+}
+
+function showStripeForm() {
+  document.getElementById('payStep1').style.display = 'none';
+  document.getElementById('payStep2').style.display = 'block';
+  if (!stripeCardElement && typeof Stripe !== 'undefined') initStripe();
+}
+
+async function handleStripePayment() {
+  const email = document.getElementById('stripeEmail').value.trim();
+  if (!email) { alert('Please enter your email address.'); return; }
+
+  const btn = document.getElementById('stripe-pay-btn');
+  btn.textContent = 'Processing…'; btn.disabled = true;
+
+  // For a static HTML site, the easiest path is Stripe Checkout with a small backend
+  // (Netlify/Vercel function). For now this simulates a successful payment so you can
+  // test the UI flow:
+  setTimeout(() => {
+    showEnrollSuccess();
+    btn.textContent = '🔒 Pay $19.99'; btn.disabled = false;
+  }, 1800);
+}
+
+// ── PAYPAL SETUP ──
+function initPayPal() {
+  if (typeof paypal_sdk === 'undefined') return;
+  paypal_sdk.Buttons({
+    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 45 },
+    createOrder: (data, actions) => actions.order.create({
+      purchase_units: [{ amount: { value: '19.99', currency_code: 'USD' }, description: 'Drug Screening Academy by Regium – Course Enrollment' }]
+    }),
+    onApprove: async (data, actions) => {
+      await actions.order.capture();
+      showEnrollSuccess();
+    },
+    onError: err => {
+      console.error('PayPal error:', err);
+      alert('Payment could not be processed. Please try again or use a card.');
+    }
+  }).render('#paypal-button-container');
+}
+
+// ── SHARED PAYMENT HELPERS ──
+function openPayment() {
+  document.getElementById('paymentModal').classList.add('open');
+  document.getElementById('payStep1').style.display = 'block';
+  document.getElementById('payStep2').style.display = 'none';
+  document.getElementById('enrollSuccess').style.display = 'none';
+  if (typeof paypal_sdk !== 'undefined' && !document.querySelector('#paypal-button-container iframe')) {
+    initPayPal();
+  }
+}
+
+function closePayment() { document.getElementById('paymentModal').classList.remove('open'); }
+
+function showEnrollSuccess() {
+  document.getElementById('payStep1').style.display = 'none';
+  document.getElementById('payStep2').style.display = 'none';
+  document.getElementById('enrollSuccess').style.display = 'block';
+}
+
+function unlockModules() {
+  document.querySelectorAll('.module.locked').forEach(m => {
+    m.classList.remove('locked');
+    const lock = m.querySelector('.module-lock');
+    if (lock) { lock.textContent = '▾'; }
+    const num = m.querySelector('.module-num');
+    if (num) num.style.background = 'var(--primary)';
+  });
+}
+
+// ── INQUIRY FORM ──
+function submitInquiry(e) {
+  e.preventDefault();
+  document.getElementById('inquiryForm').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+}
+
+// ── CHAT ROOM ──
+const seedMessages = [
+  { user: "Renee P.", text: "Just finished my DOT collector training and landed my first contract with a local trucking company. 🎉 This module 13 roadmap was clutch.", time: "8:02 AM", color: "#0f766e" },
+  { user: "Carlos M.", text: "Congrats Renee! How are you handling the lab/MRO relationship for confirmations?", time: "8:09 AM", color: "#0d9488" },
+  { user: "Renee P.", text: "I went with a SAMHSA-certified regional lab — they bundle MRO review for a flat per-specimen fee. Made onboarding way easier.", time: "8:15 AM", color: "#0f766e" },
+  { user: "Tasha B.", text: "Anyone doing mobile collections for staffing agencies? I'm trying to figure out a fair travel fee structure.", time: "8:24 AM", color: "#dc2626" },
+  { user: "Marcus J.", text: "I charge a flat $25 trip fee within 15 miles, then $1.50/mile after that. Staffing agencies have been fine with it.", time: "8:31 AM", color: "#7c3aed" },
+  { user: "Coach Dana", text: "Reminder: if you're collecting for DOT-regulated drivers, double-check your refresher training is current — every 5 years per Part 40 Subpart C.", time: "8:40 AM", color: "#134e4a" },
+  { user: "Priya S.", text: "Module 11 saved me — had a client in Illinois and almost missed the BIPA-adjacent procedural requirements for THC results. Worth re-reading before any new state.", time: "8:47 AM", color: "#d97706" },
+];
+
+function renderChat() {
+  const body = document.getElementById('chatBody');
+  const stored = JSON.parse(localStorage.getItem('drugscreening_chat') || '[]');
+  const all = [...seedMessages, ...stored];
+  body.innerHTML = all.map((m, i) => `
+    <div class="chat-msg ${m.mine ? 'mine' : ''}">
+      <div class="chat-avatar" style="background:${m.color || '#0f766e'}">${(m.user||'?')[0].toUpperCase()}</div>
+      <div>
+        <div class="chat-bubble ${m.mine ? 'mine' : ''}">
+          <div class="chat-user">${m.user}</div>
+          <div class="chat-text">${m.text}</div>
+          <div class="chat-time">${m.time}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  body.scrollTop = body.scrollHeight;
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const nameInput = document.getElementById('chatName');
+  const text = input.value.trim();
+  const name = nameInput.value.trim() || 'You';
+  if (!text) return;
+  const now = new Date();
+  const time = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  const colors = ['#0f766e','#0d9488','#7c3aed','#dc2626','#d97706','#be185d'];
+  const color = colors[Math.floor(Math.random()*colors.length)];
+  const msg = { user: name, text, time, mine: true, color };
+  const stored = JSON.parse(localStorage.getItem('drugscreening_chat') || '[]');
+  stored.push(msg);
+  if (stored.length > 50) stored.splice(0, stored.length - 50);
+  localStorage.setItem('drugscreening_chat', JSON.stringify(stored));
+  input.value = '';
+  renderChat();
+}
+
+// Simulate random online count
+function updateOnline() {
+  const base = 11;
+  document.getElementById('onlineNum').textContent = base + Math.floor(Math.random()*8);
+}
+
+// ── NAV HAMBURGER ──
+document.getElementById('hamburger').onclick = function() {
+  document.getElementById('navLinks').classList.toggle('open');
+};
+
+// Close modal on overlay click
+document.getElementById('paymentModal').onclick = function(e) { if(e.target===this) closePayment(); };
+
+// ── INIT ──
+renderChat();
+setInterval(updateOnline, 8000);
+
+// Auto-open first module
+document.querySelector('.module .module-body').classList.add('open');
+</script>
+</body>
+</html>
